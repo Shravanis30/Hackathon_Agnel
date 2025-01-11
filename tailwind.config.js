@@ -18,17 +18,18 @@
 //   plugins: [],
 // };
 
-/** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    './index.html',  // for HTML files
-    './src/**/*.{js,jsx,ts,tsx}',  // for React or TypeScript files
-  ],
+  content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      colors: {
-        primary: '#1E3A8A', // Blue theme color
-        secondary: '#3B82F6',
+      keyframes: {
+        shimmer: {
+          "0%": { transform: "translateX(-100%)" },
+          "100%": { transform: "translateX(100%)" },
+        },
+      },
+      animation: {
+        shimmer: "shimmer 1.5s infinite linear",
       },
     },
   },
