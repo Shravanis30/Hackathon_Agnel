@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Example: Allow clear text traffic for development (optional) -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+    </domain-config>
+
+    <!-- Example: Define secure domains (required for production) -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">your-secure-domain.com</domain>
+    </domain-config>
+</network-security-config>

@@ -1,24 +1,6 @@
-// /** @type {import('tailwindcss').Config} */
-// export default {
-//   content: ["./src/**/*.{html,js}"],
-//   theme: {
-//     extend: {},
-//   },
-//   plugins: [],
-// }
 
-// module exports = {
-//   content: [
-//     "./src/*/.{html,js,ts,jsx,tsx}",
-//     "./node_modules/@ionic/*/.{html,js,ts,jsx,tsx}",
-//   ],
-//   theme: {
-//     extend: {},
-//   },
-//   plugins: [],
-// };
 
-module.exports = {
+export default {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
