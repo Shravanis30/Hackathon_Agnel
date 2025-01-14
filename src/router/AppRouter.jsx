@@ -1,33 +1,4 @@
-// // import React from "react";
-// // import { Routes, Route, Navigate } from "react-router-dom";
-// // import GestureSOS from "../components/GestureSOS";
-// // import LiveLocation from "../components/LiveLocation";
-// // import EmergencyContacts from "../components/EmergencyContacts";
-// // import HiddenCamera from "../components/HiddenCamera";
-// // import LiveAudio from "../components/LiveAudio";
-// // import AlertBell from "../components/AlertBell";
-// // import SplashScreen from "../components/SplashScreen";
 
-// // function AppRouter() {
-// //   return (
-// //     <Routes>
-// //       {/* Default Route */}
-// //       <Route path="/" element={<Navigate to="/splash-screen" />} />
-      
-// //       {/* Pages */}
-// //       <Route path="/splash-screen" element={<SplashScreen />} />
-// //       <Route path="/gesture-sos" element={<GestureSOS />} />
-// //       <Route path="/live-location" element={<LiveLocation />} />
-// //       <Route path="/emergency-contacts" element={<EmergencyContacts />} />
-      
-// //       <Route path="/hidden-camera" element={<HiddenCamera />} />
-// //       <Route path="/live-audio" element={<LiveAudio />} />
-// //       <Route path="/alert-bell" element={<AlertBell />} />
-// //     </Routes>
-// //   );
-// // }
-
-// // export default AppRouter;
 
 
 import React from "react";
@@ -48,6 +19,14 @@ import IHiddenCamera from '../components/IHiddenCamera';
 import ILiveAudio from '../components/ILiveAudio';
 import IAlertBell from '../components/IAlertBell';
 import Home from '../components/Home'
+
+import GestureSOS from '../components/GestureSOS'
+import { sendPushNotification } from "../components/pushNotification";
+import Home1 from '../components/Home1'
+
+
+import SignIn from '../components/SignIn'
+import SignUp from '../components/SignUp'
 
 function AppRouter() {
   return (
@@ -72,6 +51,19 @@ function AppRouter() {
       <Route path="/Ihidden-camera" element={<IHiddenCamera />} />
       <Route path="/Ilive-audio" element={<ILiveAudio />} />
       <Route path="/Ialert-bell" element={<IAlertBell />} />
+
+      <Route path="/gestureSOS" element={<GestureSOS />} />
+      <Route path="/sendPushNotification" element={<sendPushNotification />} />
+      <Route path="/home1" element={<Home1 />} />
+
+
+      
+      <Route path="/signIn" element={<SignIn />} />
+      <Route path="/signUp" element={<SignUp />} />
+
+
+
+      
     </Routes>
   );
 }

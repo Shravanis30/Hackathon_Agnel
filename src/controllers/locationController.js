@@ -1,17 +1,51 @@
-const admin = require('firebase-admin');
-const db = admin.firestore();
+// locationController.js
 
-exports.updateLocation = async (req, res) => {
-    const { userId, location } = req.body;
+/**
+ * Gets the user's current location (latitude and longitude).
+ * @returns {Promise<object>} - Returns an object with latitude and longitude.
+ */
+export const getCurrentLocation = () => {
+    return new Promise((resolve, reject) => {
+      if (!navigator.geolocation) {
+        reject("Geolocation is not supported by this browser.");
+      } else {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            resolve({ latitude, longitude });
+          },
+          (error) => {
+            reject("Unable to fetch location. Error: " + error.message);
+          },
+          { enableHighAccuracy: true }
+        );
+      }
+    });
+  };
+  
+  /**
+   * Sends the user's location to a backend API.
+   * @param {object} location - The user's location object containing latitude and longitude.
+   * @returns {Promise<string>} - Returns a success message from the API.
+   */
+  export const sendLocationToAPI = async (location) => {
     try {
-        const userRef = db.collection('live_locations').doc(userId);
-        await userRef.set({
-            location,
-            timestamp: admin.firestore.FieldValue.serverTimestamp()
-        });
-        return res.status(200).json({ message: 'Location updated successfully!' });
+      const response = await fetch("https://your-backend-api.com/location", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(location),
+      });
+  
+      if (!response.ok) {
+        throw new Error("Failed to send location to the API.");
+      }
+  
+      const data = await response.json();
+      return data.message || "Location sent successfully!";
     } catch (error) {
-        console.error('[Location Update Error]', error);
-        return res.status(500).json({ message: 'Error updating location.' });
+      throw new Error(error.message || "An error occurred while sending location.");
     }
-};
+  };
+  

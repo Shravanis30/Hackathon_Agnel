@@ -1,29 +1,43 @@
-// src/components/EmergencyContacts.jsx
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+
+
+import React, { useState, useEffect } from "react";
+import { getContacts, addContact } from "../firebase/firestoreUtils";
 
 const EmergencyContacts = () => {
   const [contacts, setContacts] = useState([]);
+  const [newContact, setNewContact] = useState("");
 
   useEffect(() => {
     const fetchContacts = async () => {
-      const response = await axios.get('/api/emergency/contacts');
-      setContacts(response.data);
+      const data = await getContacts();
+      setContacts(data);
     };
-
     fetchContacts();
   }, []);
 
+  const handleAddContact = async () => {
+    if (newContact.trim()) {
+      await addContact(newContact);
+      setContacts((prev) => [...prev, newContact]);
+      setNewContact("");
+    }
+  };
+
   return (
-    <div className="p-4 bg-gray-100 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Emergency Contacts</h2>
+    <div>
+      <h1>Emergency Contacts</h1>
       <ul>
         {contacts.map((contact, index) => (
-          <li key={index} className="mb-2">
-            <span className="font-bold">{contact.name}:</span> {contact.phone}
-          </li>
+          <li key={index}>{contact}</li>
         ))}
       </ul>
+      <input
+        type="text"
+        placeholder="Add new contact"
+        value={newContact}
+        onChange={(e) => setNewContact(e.target.value)}
+      />
+      <button onClick={handleAddContact}>Add Contact</button>
     </div>
   );
 };
