@@ -3,24 +3,30 @@ import { Camera, CameraResultType } from '@capacitor/camera';
 import { Geolocation } from '@capacitor/geolocation';
 import { Device } from '@capacitor/device';
 import { Motion } from '@capacitor/motion';
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import { PushNotifications } from '@capacitor/push-notifications';
-import { sendPushNotification } from './pushNotification'; // we'll implement this shortly
+import { getDocs, collection } from 'firebase/firestore';
+// import { db } from './firebaseConfig';  // Import db from firebaseConfig.js
+// import { PushNotifications } from '@capacitor/push-notifications';
+// import { sendPushNotification } from './pushNotification'; // We'll implement this shortly
 
 const IGestureSOS = () => {
   const [shakeCount, setShakeCount] = useState(0);
   const [emergencyContacts, setEmergencyContacts] = useState([]);
   const [location, setLocation] = useState(null);
+  const [isSOSActive, setIsSOSActive] = useState(false);
   const powerButtonPressCount = useRef(0);
 
   // Fetch emergency contacts from Firebase Firestore
   const getEmergencyContacts = async () => {
     const contacts = [];
-    const querySnapshot = await getDocs(collection(db, 'emergencyContacts'));
-    querySnapshot.forEach((doc) => {
-      contacts.push(doc.data());
-    });
-    setEmergencyContacts(contacts);
+    try {
+      const querySnapshot = await getDocs(collection(db, 'emergencyContacts'));
+      querySnapshot.forEach((doc) => {
+        contacts.push(doc.data());
+      });
+      setEmergencyContacts(contacts);
+    } catch (err) {
+      console.error('Error fetching emergency contacts:', err);
+    }
   };
 
   // Get current location of the user
@@ -33,8 +39,11 @@ const IGestureSOS = () => {
     }
   };
 
-  // Send push notifications to emergency contacts
-  const sendAlert = async () => {
+  // Send live location updates to emergency contacts
+  const sendLiveLocationAlert = async () => {
+    if (!location) {
+      await getCurrentLocation();
+    }
     const message = `Emergency Alert! My current location is Latitude: ${location.latitude}, Longitude: ${location.longitude}`;
     emergencyContacts.forEach(async (contact) => {
       await sendPushNotification(contact.token, message);
@@ -44,9 +53,10 @@ const IGestureSOS = () => {
   // SOS Button click handler
   const handleSOSButtonClick = async () => {
     console.log('SOS Button Pressed!');
+    setIsSOSActive(true);
     await getCurrentLocation();
     if (location) {
-      await sendAlert();
+      await sendLiveLocationAlert();
     }
     // Trigger Hidden Camera & Voice Recording
     activateHiddenCameraAndRecording();
@@ -58,7 +68,7 @@ const IGestureSOS = () => {
     const shakeHandler = async () => {
       shakeSubscription = await Motion.addListener('shake', () => {
         setShakeCount((prev) => prev + 1);
-        if (shakeCount >= 3) {
+        if (shakeCount >= 3 && !isSOSActive) {
           handleSOSButtonClick();
         }
       });
@@ -70,17 +80,17 @@ const IGestureSOS = () => {
         shakeSubscription.remove();
       }
     };
-  }, [shakeCount]);
+  }, [shakeCount, isSOSActive]);
 
   // Power button press detection
   useEffect(() => {
     const interval = setInterval(async () => {
       const deviceInfo = await Device.getInfo();
       if (deviceInfo.platform === 'android' || deviceInfo.platform === 'ios') {
-        if (powerButtonPressCount.current === 3) {
+        if (powerButtonPressCount.current === 3 && !isSOSActive) {
           await getCurrentLocation();
           if (location) {
-            await sendAlert();
+            await sendLiveLocationAlert();
           }
           activateHiddenCameraAndRecording();
         }
@@ -88,7 +98,7 @@ const IGestureSOS = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [location]);
+  }, [location, isSOSActive]);
 
   // Activate hidden camera and voice recording
   const activateHiddenCameraAndRecording = async () => {
@@ -97,7 +107,7 @@ const IGestureSOS = () => {
       resultType: CameraResultType.Uri,
     });
     const videoUrl = await startVoiceRecording(); // Implement this function
-    sendAlert(image, videoUrl);
+    sendLiveLocationAlert(image, videoUrl);
   };
 
   // Initialize Push Notifications
@@ -115,7 +125,7 @@ const IGestureSOS = () => {
       PushNotifications.addListener('pushNotificationReceived', (notification) => {
         console.log('Received push notification: ', notification);
       });
-      
+
       PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
         console.log('Push notification action performed: ', action);
       });

@@ -1,92 +1,96 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { Icon } from "leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
+import { MapPin, Phone } from "lucide-react";
+import { Geolocation } from "@capacitor/geolocation"; // Importing Capacitor Geolocation
+import { useNavigate } from "react-router-dom"; // Import useNavigate from react-router-dom
 
-function HomeMain() {
-  const center = [23.7808875, 90.279237]; // Dhaka coordinates for the center of the map
-  const customIcon = new Icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png", // Replace with your icon URL
-    iconSize: [40, 40], // Adjust the size of the marker
-  });
+// Fix for default marker icon issue in Leaflet
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png",
+  iconUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png",
+});
+
+export default function Home() {
+  const [currentLocation, setCurrentLocation] = useState([20.5937, 78.9629]); // Default to India's center
+  const [locationReady, setLocationReady] = useState(false);
+  const navigate = useNavigate(); // Initialize useNavigate hook
+
+  useEffect(() => {
+    // Get location using Capacitor Geolocation API
+    const getLocation = async () => {
+      try {
+        const position = await Geolocation.getCurrentPosition();
+        setCurrentLocation([position.coords.latitude, position.coords.longitude]);
+        setLocationReady(true);
+      } catch (error) {
+        alert("Unable to fetch location.");
+        console.error("Geolocation error:", error);
+      }
+    };
+
+    getLocation(); // Call the function to get the current location
+  }, []);
+
+  // Navigate to GestureSOS page when SOS button is clicked
+  const handleSOSButtonClick = () => {
+    navigate("/gesturesos"); // Navigate to the GestureSOS page
+  };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-100">
-      {/* Header */}
-      <header className="bg-red-500 text-white p-4 flex items-center justify-between">
-        <div className="flex items-center">
-          <img
-            src="https://via.placeholder.com/40" // Replace with the user profile picture
-            alt="User Avatar"
-            className="w-10 h-10 rounded-full mr-3"
-          />
-          <div>
-            <h3 className="text-lg font-bold">Faria Islam</h3>
-            <p className="text-sm">Triggered panic alert</p>
-            <p className="text-xs italic">Tap for more details</p>
-          </div>
-        </div>
-        <div className="text-right">
-          <p className="text-2xl font-bold">Safe Code</p>
-          <p className="text-3xl font-bold">8149</p>
-        </div>
-      </header>
-
-      {/* Map Section */}
-      <div className="flex-1 relative">
+    <div className="min-h-screen bg-gray-200 flex flex-col justify-between items-center">
+      {/* Leaflet Map View */}
+      <div className="flex-grow w-full">
         <MapContainer
-          center={center}
-          zoom={15}
-          style={{ height: "100%", width: "100%" }}
+          center={currentLocation}
+          zoom={13}
+          style={{ width: "100%", height: "60vh" }}
         >
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <Marker position={center} icon={customIcon}>
-            <Popup>Faria's Location</Popup>
-          </Marker>
+          {/* Add a Tile Layer */}
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          {locationReady && (
+            <Marker position={currentLocation}>
+              <Popup>Your current location</Popup>
+            </Marker>
+          )}
         </MapContainer>
-        {/* Track Me Button */}
-        <button className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-pink-500 text-white px-6 py-3 rounded-full shadow-lg font-semibold">
-          Track Me
-        </button>
       </div>
 
       {/* Bottom Navigation */}
-      <nav className="bg-white border-t border-gray-200 py-2 flex justify-between items-center px-6">
-        <button className="flex flex-col items-center text-pink-500">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            className="w-6 h-6 mb-1"
-            viewBox="0 0 20 20"
+      <div className="w-full flex justify-between items-center p-4 bg-transparent">
+        {/* Share Location */}
+        <div className="flex flex-col items-center">
+          <div className="flex justify-center items-center bg-white shadow-md rounded-full w-14 h-14">
+            <MapPin className="w-6 h-6 text-gray-700" />
+          </div>
+          <span className="text-xs text-gray-600 mt-2">Share Location</span>
+        </div>
+
+        {/* SOS Button */}
+        <div className="flex justify-center items-center">
+          <button
+            className="bg-red-600 text-white font-bold text-sm px-6 py-6 rounded-full shadow-lg hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-4 focus:ring-red-300"
+            aria-label="SOS Button"
+            onClick={handleSOSButtonClick} // Add onClick to navigate
           >
-            <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zM8 14.414L3.586 10 8 5.586 9.414 7 7.828 8.586H16v2H7.828L9.414 13 8 14.414z" />
-          </svg>
-          <span>Track Me</span>
-        </button>
-        <button className="flex flex-col items-center text-red-500">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            className="w-6 h-6 mb-1"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 2a8 8 0 1 1 0 16 8 8 0 0 1 0-16zm.866 4.5l-1 6h-2l1-6h2zm-1 8a1.5 1.5 0 1 1-.001 3.001A1.5 1.5 0 0 1 9.866 14.5z" />
-          </svg>
-          <span>Panic</span>
-        </button>
-        <button className="flex flex-col items-center text-gray-500">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            className="w-6 h-6 mb-1"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 0C4.477 0 0 4.477 0 10s4.477 10 10 10 10-4.477 10-10S15.523 0 10 0zm2.5 15h-5v-1h5v1zm.25-4h-5.5L6.5 6h7l-1.75 5z" />
-          </svg>
-          <span>Record</span>
-        </button>
-      </nav>
+            SOS
+          </button>
+        </div>
+
+        {/* Helpline */}
+        <div className="flex flex-col items-center">
+          <div className="flex justify-center items-center bg-white shadow-md rounded-full w-14 h-14">
+            <Phone className="w-6 h-6 text-gray-700" />
+          </div>
+          <span className="text-xs text-gray-600 mt-2">Helpline</span>
+        </div>
+      </div>
     </div>
   );
 }
-
-export default HomeMain;

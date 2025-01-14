@@ -21,17 +21,15 @@ import IAlertBell from '../components/IAlertBell';
 import Home from '../components/Home'
 
 import GestureSOS from '../components/GestureSOS'
-import { sendPushNotification } from "../components/pushNotification";
-import Home1 from '../components/Home1'
 
 
-import SignIn from '../components/SignIn'
-import SignUp from '../components/SignUp'
 
 import HomeMain from '../components/HomeMain'
 import AccountPage from '../components/AccountPage'
 import LoginPage from '../components/LoginPage'
 import UserInfoPage from '../components/UserInfoPage'
+
+import AddContacts from "../components/AddContacts";
 
 
 
@@ -60,17 +58,14 @@ function AppRouter() {
       <Route path="/Ialert-bell" element={<IAlertBell />} />
 
       <Route path="/gestureSOS" element={<GestureSOS />} />
-      <Route path="/sendPushNotification" element={<sendPushNotification />} />
-      <Route path="/home1" element={<Home1 />} />
-      
-      <Route path="/signIn" element={<SignIn />} />
-      <Route path="/signUp" element={<SignUp />} />
 
 
       <Route path="/loginPage" element={<LoginPage />} />
       <Route path="/accountPage" element={<AccountPage />} />
       <Route path="/homeMain" element={<HomeMain />} />
       <Route path="/userInfoPage" element={<UserInfoPage />} />
+
+      <Route path="/addContacts" element={<AddContacts />} />
 
 
 
