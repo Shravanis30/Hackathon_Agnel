@@ -1,19 +1,24 @@
 import React, { useState } from "react";
 import { registerUser } from "../utils/authUtils";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import app from "../firebase"; // Adjust the path to your firebase.js file
+
+const auth = getAuth(app);
 
 const SignUp = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [status, setStatus] = useState("");
+  const [email, setemail] = useState("")
+  const [password, setpassword] = useState("")
 
-  const handleSignUp = async () => {
+  const createUser = async () => {
     try {
-      const user = await registerUser(email, password);
-      setStatus(`Account created for ${user.email}!`);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log("User created:", userCredential.user);
     } catch (error) {
-      setStatus(error.message);
+      console.error("Error creating user:", error.message);
+      alert(`Failed to create account: ${error.message}`);
     }
   };
+  
 
   return (
     <div>
@@ -21,17 +26,19 @@ const SignUp = () => {
       <input
         type="email"
         placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={(e) => setemail(e.target.value)}
       />
       <input
         type="password"
         placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={(e) => setpassword(e.target.value)}
+
       />
-      <button onClick={handleSignUp}>Sign Up</button>
-      {status && <p>{status}</p>}
+
+      <button onClick={createUser}>
+      Signup
+      </button>
+    
     </div>
   );
 };

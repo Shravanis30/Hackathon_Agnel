@@ -13,8 +13,8 @@ import LandingPage from "../components/LandingPage";
 
 
 import IGestureSOS from '../components/IGestureSOS';
-import ILiveLocation from '../components/ILiveLocation';
-import IEmergencyContacts from '../components/IEmergencyContacts';
+// import ILiveLocation from '../components/ILiveLocation';
+// import IEmergencyContacts from '../components/IEmergencyContacts';
 import IHiddenCamera from '../components/IHiddenCamera';
 import ILiveAudio from '../components/ILiveAudio';
 import IAlertBell from '../components/IAlertBell';
@@ -27,6 +27,13 @@ import Home1 from '../components/Home1'
 
 import SignIn from '../components/SignIn'
 import SignUp from '../components/SignUp'
+
+import HomeMain from '../components/HomeMain'
+import AccountPage from '../components/AccountPage'
+import LoginPage from '../components/LoginPage'
+import UserInfoPage from '../components/UserInfoPage'
+
+
 
 function AppRouter() {
   return (
@@ -46,8 +53,8 @@ function AppRouter() {
 
       <Route path="/home" element={<Home />} />
       <Route path="/Igesture-sos" element={<IGestureSOS />} />
-      <Route path="/Ilive-location" element={<ILiveLocation />} />
-      <Route path="/Iemergency-contacts" element={<IEmergencyContacts />} />
+      {/* <Route path="/Ilive-location" element={<ILiveLocation />} /> */}
+      {/* <Route path="/Iemergency-contacts" element={<IEmergencyContacts />} /> */}
       <Route path="/Ihidden-camera" element={<IHiddenCamera />} />
       <Route path="/Ilive-audio" element={<ILiveAudio />} />
       <Route path="/Ialert-bell" element={<IAlertBell />} />
@@ -55,11 +62,17 @@ function AppRouter() {
       <Route path="/gestureSOS" element={<GestureSOS />} />
       <Route path="/sendPushNotification" element={<sendPushNotification />} />
       <Route path="/home1" element={<Home1 />} />
-
-
       
       <Route path="/signIn" element={<SignIn />} />
       <Route path="/signUp" element={<SignUp />} />
+
+
+      <Route path="/loginPage" element={<LoginPage />} />
+      <Route path="/accountPage" element={<AccountPage />} />
+      <Route path="/homeMain" element={<HomeMain />} />
+      <Route path="/userInfoPage" element={<UserInfoPage />} />
+
+
 
 
 
