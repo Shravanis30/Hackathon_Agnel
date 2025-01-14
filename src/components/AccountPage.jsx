@@ -192,7 +192,7 @@ function AccountPage() {
       <p className="mt-6">
         Don't have an account?{" "}
         <span
-          onClick={() => navigate("/signup")}
+          onClick={() => navigate("/signUp")}
           className="text-pink-500 cursor-pointer underline"
         >
           Sign up here

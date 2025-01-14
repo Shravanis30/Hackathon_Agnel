@@ -5,11 +5,11 @@ function AlertBell() {
   const navigate = useNavigate();
 
   const handleSkip = () => {
-    navigate("/home"); // Navigate to the home page (SplashScreen)
+    navigate("/accountPage"); // Navigate to the home page (SplashScreen)
   };
 
   const handleNext = () => {
-    navigate("/home"); // Navigate to the next page (EmergencyContacts)
+    navigate("/accountPage"); // Navigate to the next page (EmergencyContacts)
   };
   return (
     <div className="min-h-screen bg-gradient-to-b from-blue-800 via-blue-600 to-blue-300 text-white flex flex-col items-center justify-center text-center p-4">

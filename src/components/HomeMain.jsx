@@ -40,6 +40,11 @@ export default function Home() {
     navigate("/gesturesos"); // Navigate to the GestureSOS page
   };
 
+  // Navigate to Helpline page when the helpline icon is clicked
+  const handleHelplineButtonClick = () => {
+    navigate("/helpline"); // Navigate to the Helpline page
+  };
+
   return (
     <div className="min-h-screen bg-gray-200 flex flex-col justify-between items-center">
       {/* Leaflet Map View */}
@@ -85,7 +90,10 @@ export default function Home() {
 
         {/* Helpline */}
         <div className="flex flex-col items-center">
-          <div className="flex justify-center items-center bg-white shadow-md rounded-full w-14 h-14">
+          <div
+            onClick={handleHelplineButtonClick} // Add onClick to navigate to Helpline
+            className="flex justify-center items-center bg-white shadow-md rounded-full w-14 h-14 cursor-pointer"
+          >
             <Phone className="w-6 h-6 text-gray-700" />
           </div>
           <span className="text-xs text-gray-600 mt-2">Helpline</span>

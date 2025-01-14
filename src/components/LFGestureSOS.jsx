@@ -30,7 +30,7 @@ function LFGestureSOS() {
   const navigate = useNavigate();
 
   const handleSkip = () => {
-    navigate("/"); // Navigate to the home page (SplashScreen)
+    navigate("/accountPage"); // Navigate to the home page (SplashScreen)
   };
 
   const handleNext = () => {

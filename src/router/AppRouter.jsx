@@ -12,12 +12,12 @@ import LFAlertBell from "../components/LFAlertBell";
 import LandingPage from "../components/LandingPage";
 
 
-import IGestureSOS from '../components/IGestureSOS';
-// import ILiveLocation from '../components/ILiveLocation';
-// import IEmergencyContacts from '../components/IEmergencyContacts';
-import IHiddenCamera from '../components/IHiddenCamera';
-import ILiveAudio from '../components/ILiveAudio';
-import IAlertBell from '../components/IAlertBell';
+// import IGestureSOS from '../components/IGestureSOS';
+// // import ILiveLocation from '../components/ILiveLocation';
+// // import IEmergencyContacts from '../components/IEmergencyContacts';
+// import IHiddenCamera from '../components/IHiddenCamera';
+// import ILiveAudio from '../components/ILiveAudio';
+// import IAlertBell from '../components/IAlertBell';
 import Home from '../components/Home'
 
 import GestureSOS from '../components/GestureSOS'
@@ -30,6 +30,9 @@ import LoginPage from '../components/LoginPage'
 import UserInfoPage from '../components/UserInfoPage'
 
 import AddContacts from "../components/AddContacts";
+import SignUp from '../components/SignUp'
+
+import Helpline from "../components/Helpline";
 
 
 
@@ -38,7 +41,7 @@ function AppRouter() {
     <Routes>
       {/* Default Route */}
       <Route path="/" element={<Navigate to="/splash-screen" />} />
-      
+
       {/* Pages */}
       <Route path="/splash-screen" element={<LandingPage />} />
       <Route path="/gesture-sos" element={<LFGestureSOS />} />
@@ -50,13 +53,6 @@ function AppRouter() {
 
 
       <Route path="/home" element={<Home />} />
-      <Route path="/Igesture-sos" element={<IGestureSOS />} />
-      {/* <Route path="/Ilive-location" element={<ILiveLocation />} /> */}
-      {/* <Route path="/Iemergency-contacts" element={<IEmergencyContacts />} /> */}
-      <Route path="/Ihidden-camera" element={<IHiddenCamera />} />
-      <Route path="/Ilive-audio" element={<ILiveAudio />} />
-      <Route path="/Ialert-bell" element={<IAlertBell />} />
-
       <Route path="/gestureSOS" element={<GestureSOS />} />
 
 
@@ -64,14 +60,18 @@ function AppRouter() {
       <Route path="/accountPage" element={<AccountPage />} />
       <Route path="/homeMain" element={<HomeMain />} />
       <Route path="/userInfoPage" element={<UserInfoPage />} />
+      <Route path="/signUp" element={<SignUp />} />
+
 
       <Route path="/addContacts" element={<AddContacts />} />
+      <Route path="/helpline" element={<Helpline />} />
 
 
 
 
 
-      
+
+
     </Routes>
   );
 }

@@ -1,27 +1,33 @@
-// Import the functions you need from the SDKs you need
+// Import the functions you need from the SDKs
 import { initializeApp, getApp, getApps } from "firebase/app";
-import { getAuth } from "firebase/auth"; // Import auth functions
-import { getAnalytics } from "firebase/analytics";
+import { getAuth } from "firebase/auth"; // Firebase Authentication
+import { getAnalytics } from "firebase/analytics"; // Firebase Analytics
+import { getFirestore } from 'firebase/firestore';
 
-// Your web app's Firebase configuration
+
+// Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyConx387VetNR6lA09XJFLepjFE39lVrZ8",
-  authDomain: "htagnel.firebaseapp.com",
-  projectId: "htagnel",
-  storageBucket: "htagnel.firebasestorage.app",
-  messagingSenderId: "1099332989195",
-  appId: "1:1099332989195:web:e924717fbeca1b0818b20e",
-  measurementId: "G-DZ549HG89K"
+  apiKey: "AIzaSyDUcgVwhAeMRYr57I5ZbizIsZvVZtvDqBk",
+  authDomain: "newapp-2c597.firebaseapp.com",
+  projectId: "newapp-2c597",
+  storageBucket: "newapp-2c597.firebasestorage.app",
+  messagingSenderId: "880082219668",
+  appId: "1:880082219668:web:8baf9071b8d738993f7a81",
+  measurementId: "G-QV673W0ZZD"
 };
+console.log("Firebase API Key:", firebaseConfig.apiKey);
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();  // Check if Firebase is already initialized
+// Initialize Firebase only if it hasn't been initialized already
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 // Initialize Firebase Authentication
-const auth = getAuth(app); // Create the auth instance
+const auth = getAuth(app);
 
-// Initialize Analytics (optional, for analytics tracking)
-const analytics = getAnalytics(app);
+const db = getFirestore(app);
 
-// Export auth so you can use it elsewhere in your app
-export { auth, app, analytics };
+
+// Initialize Analytics (optional, if using analytics)
+const analytics = typeof window !== "undefined" && getAnalytics(app);
+
+// Export the Firebase services
+export { app, auth, analytics, db };
