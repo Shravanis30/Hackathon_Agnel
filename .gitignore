@@ -31,3 +31,4 @@ dist-ssr
 build
 
 firebase.js
+functions/index.js

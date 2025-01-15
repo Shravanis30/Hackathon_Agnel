@@ -73,11 +73,11 @@ const logger = require("firebase-functions/logger");
 
 const functions = require("firebase-functions");
 const twilio = require("twilio");
+require("dotenv").config();
 
-// Twilio credentials
-const accountSid = "AC591bfb307d2a6defdacbb8761a646fbf";
-const authToken = "e9024e10d90cfb7daeefcaa72625982e";
-const twilioPhoneNumber = "+16812068603";
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
 
 const client = twilio(accountSid, authToken);
 
