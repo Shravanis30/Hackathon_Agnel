@@ -134,24 +134,159 @@
 
 
 
+// import React, { useState, useEffect } from "react";
+// import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
+// import { Geolocation } from "@capacitor/geolocation";
+// import { Motion } from "@capacitor/motion";
+// import { database } from "../firebase"; // Import Firebase database
+// import { ref, push } from "firebase/database";
+
+// const IGestureSOS = () => {
+//   const [shakeCount, setShakeCount] = useState(0);
+//   const [emergencyContacts, setEmergencyContacts] = useState([]);
+//   const [location, setLocation] = useState(null);
+//   const [isSOSActive, setIsSOSActive] = useState(false);
+
+//   const getEmergencyContacts = () => {
+//     const contacts = localStorage.getItem("emergencyContacts");
+//     if (contacts) {
+//       setEmergencyContacts(JSON.parse(contacts));
+//     }
+//   };
+
+//   const getCurrentLocation = async () => {
+//     try {
+//       const position = await Geolocation.getCurrentPosition();
+//       setLocation(position.coords);
+//     } catch (err) {
+//       console.error("Error getting location:", err);
+//     }
+//   };
+
+//   const sendLiveLocationAlert = async (photoUri = null) => {
+//     if (!location) {
+//       await getCurrentLocation();
+//     }
+//     const message = `Emergency Alert! My current location is Latitude: ${location.latitude}, Longitude: ${location.longitude}.`;
+
+//     const alertsRef = ref(database, "alerts");
+//     const alertData = {
+//       message,
+//       photoUri,
+//       contacts: emergencyContacts,
+//       timestamp: new Date().toISOString(),
+//     };
+//     try {
+//       await push(alertsRef, alertData);
+//       console.log("Alert sent to Firebase:", alertData);
+//     } catch (err) {
+//       console.error("Error saving alert to Firebase:", err);
+//     }
+//   };
+
+//   const handleSOSButtonClick = async () => {
+//     setIsSOSActive(true);
+//     await getCurrentLocation();
+//     if (location) {
+//       await activateHiddenCamera();
+//     }
+//   };
+
+//   useEffect(() => {
+//     let lastX = 0,
+//       lastY = 0,
+//       lastZ = 0,
+//       shakeCount = 0;
+//     const threshold = 15;
+//     const shakeHandler = async () => {
+//       const listener = await Motion.addListener("accel", (event) => {
+//         const { x, y, z } = event.acceleration || {};
+//         const deltaX = Math.abs(x - lastX);
+//         const deltaY = Math.abs(y - lastY);
+//         const deltaZ = Math.abs(z - lastZ);
+
+//         if (deltaX > threshold || deltaY > threshold || deltaZ > threshold) {
+//           shakeCount++;
+//           setShakeCount(shakeCount);
+//           if (shakeCount >= 4 && !isSOSActive) {
+//             handleSOSButtonClick();
+//           }
+//         }
+
+//         lastX = x;
+//         lastY = y;
+//         lastZ = z;
+//       });
+
+//       return () => listener.remove();
+//     };
+
+//     shakeHandler();
+//   }, [shakeCount, isSOSActive]);
+
+//   const activateHiddenCamera = async () => {
+//     try {
+//       const photo = await Camera.getPhoto({
+//         quality: 100,
+//         resultType: CameraResultType.Uri,
+//         source: CameraSource.Camera,
+//       });
+//       console.log("Photo captured:", photo.path);
+//       await sendLiveLocationAlert(photo.path);
+//     } catch (err) {
+//       console.error("Error capturing photo:", err);
+//     }
+//   };
+
+//   useEffect(() => {
+//     getEmergencyContacts();
+//   }, []);
+
+//   return (
+//     <div className="p-6 bg-gradient-to-b from-red-500 to-pink-500 min-h-screen flex flex-col items-center justify-center">
+//       <h2 className="text-3xl font-bold mb-6 text-white text-center">Emergency Alert System</h2>
+//       <button
+//         onClick={handleSOSButtonClick}
+//         className="px-8 py-4 rounded-full bg-white text-red-500 font-semibold shadow-lg hover:bg-gray-100 transition-all w-full max-w-xs mb-6"
+//       >
+//         SOS
+//       </button>
+//       <div className="bg-white p-4 rounded-lg shadow-md w-full max-w-md">
+//         <h3 className="font-medium mb-2 text-lg">Emergency Contacts:</h3>
+//         <ul>
+//           {emergencyContacts.length > 0 ? (
+//             emergencyContacts.map((contact, index) => (
+//               <li key={index} className="mb-2 text-gray-700">
+//                 {contact}
+//               </li>
+//             ))
+//           ) : (
+//             <li className="text-gray-500">No contacts added yet.</li>
+//           )}
+//         </ul>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default IGestureSOS;
 import React, { useState, useEffect } from "react";
-import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { Geolocation } from "@capacitor/geolocation";
-import { Motion } from "@capacitor/motion";
-import { database } from "../firebase"; // Import Firebase database
-import { ref, push } from "firebase/database";
+import axios from "axios";
+
+const SMS_BACKEND_URL = "https://your-backend-url.com/send-sms";
 
 const IGestureSOS = () => {
-  const [shakeCount, setShakeCount] = useState(0);
   const [emergencyContacts, setEmergencyContacts] = useState([]);
   const [location, setLocation] = useState(null);
-  const [isSOSActive, setIsSOSActive] = useState(false);
+  const [status, setStatus] = useState("");
+
+  const isValidPhoneNumber = (number) => /^\+?[1-9]\d{1,14}$/.test(number);
 
   const getEmergencyContacts = () => {
-    const contacts = localStorage.getItem("emergencyContacts");
-    if (contacts) {
-      setEmergencyContacts(JSON.parse(contacts));
-    }
+    const contacts = JSON.parse(localStorage.getItem("emergencyContacts") || "[]");
+    const validContacts = contacts.filter(isValidPhoneNumber);
+    setEmergencyContacts(validContacts);
   };
 
   const getCurrentLocation = async () => {
@@ -163,78 +298,45 @@ const IGestureSOS = () => {
     }
   };
 
-  const sendLiveLocationAlert = async (photoUri = null) => {
+  const playBuzzer = () => {
+    const audio = new Audio("/buzzer.mp3");
+    audio.play().catch((error) => {
+      console.error("Error playing buzzer:", error);
+      alert("Buzzer sound failed to play.");
+    });
+  };
+
+  const sendLiveLocationSMS = async () => {
     if (!location) {
       await getCurrentLocation();
     }
-    const message = `Emergency Alert! My current location is Latitude: ${location.latitude}, Longitude: ${location.longitude}.`;
 
-    const alertsRef = ref(database, "alerts");
-    const alertData = {
-      message,
-      photoUri,
-      contacts: emergencyContacts,
-      timestamp: new Date().toISOString(),
-    };
-    try {
-      await push(alertsRef, alertData);
-      console.log("Alert sent to Firebase:", alertData);
-    } catch (err) {
-      console.error("Error saving alert to Firebase:", err);
+    const mapsLink = `https://www.google.com/maps?q=${location.latitude},${location.longitude}`;
+    const message = `Emergency Alert! My location: ${mapsLink}`;
+
+    for (const contact of emergencyContacts) {
+      try {
+        const response = await axios.post(SMS_BACKEND_URL, {
+          to: contact,
+          message,
+        });
+        console.log(`SMS sent to ${contact}:`, response.data);
+      } catch (error) {
+        console.error(`Failed to send SMS to ${contact}:`, error.response?.data);
+      }
     }
   };
 
   const handleSOSButtonClick = async () => {
-    setIsSOSActive(true);
+    playBuzzer();
+    setStatus("Fetching location...");
     await getCurrentLocation();
+    setStatus("Sending SMS...");
     if (location) {
-      await activateHiddenCamera();
-    }
-  };
-
-  useEffect(() => {
-    let lastX = 0,
-      lastY = 0,
-      lastZ = 0,
-      shakeCount = 0;
-    const threshold = 15;
-    const shakeHandler = async () => {
-      const listener = await Motion.addListener("accel", (event) => {
-        const { x, y, z } = event.acceleration || {};
-        const deltaX = Math.abs(x - lastX);
-        const deltaY = Math.abs(y - lastY);
-        const deltaZ = Math.abs(z - lastZ);
-
-        if (deltaX > threshold || deltaY > threshold || deltaZ > threshold) {
-          shakeCount++;
-          setShakeCount(shakeCount);
-          if (shakeCount >= 4 && !isSOSActive) {
-            handleSOSButtonClick();
-          }
-        }
-
-        lastX = x;
-        lastY = y;
-        lastZ = z;
-      });
-
-      return () => listener.remove();
-    };
-
-    shakeHandler();
-  }, [shakeCount, isSOSActive]);
-
-  const activateHiddenCamera = async () => {
-    try {
-      const photo = await Camera.getPhoto({
-        quality: 100,
-        resultType: CameraResultType.Uri,
-        source: CameraSource.Camera,
-      });
-      console.log("Photo captured:", photo.path);
-      await sendLiveLocationAlert(photo.path);
-    } catch (err) {
-      console.error("Error capturing photo:", err);
+      await sendLiveLocationSMS();
+      setStatus("SOS alert sent!");
+    } else {
+      setStatus("Failed to fetch location.");
     }
   };
 
@@ -264,15 +366,13 @@ const IGestureSOS = () => {
             <li className="text-gray-500">No contacts added yet.</li>
           )}
         </ul>
+        <p className="text-sm text-gray-500 mt-4">{status}</p>
       </div>
     </div>
   );
 };
 
 export default IGestureSOS;
-
-
-
 
 
 
