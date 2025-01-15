@@ -33,6 +33,9 @@ import AddContacts from "../components/AddContacts";
 import SignUp from '../components/SignUp'
 
 import Helpline from "../components/Helpline";
+import LocationSharing from "../components/LocationSharing";
+
+import SidebarWithNavbar from "../components/SidebarWithNavbar";
 
 
 
@@ -65,10 +68,9 @@ function AppRouter() {
 
       <Route path="/addContacts" element={<AddContacts />} />
       <Route path="/helpline" element={<Helpline />} />
+      <Route path="/locationSharing" element={<LocationSharing />} />
 
-
-
-
+      <Route path="/sidebarWithNavbar" element={<SidebarWithNavbar />} />
 
 
 
