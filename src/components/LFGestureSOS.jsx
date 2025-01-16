@@ -23,7 +23,7 @@
 
 
 // LFGestureSOS.js (Second page)
-import React from "react";
+// import React from "react";
 import { useNavigate } from "react-router-dom";
 
 function LFGestureSOS() {

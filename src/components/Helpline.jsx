@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const helplines = [
   { name: 'NATIONAL EMERGENCY NUMBER', number: '112' },

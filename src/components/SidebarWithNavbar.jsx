@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Updated to useNavigate
 import { getAuth, signOut } from 'firebase/auth';
 import { FaUser, FaPhoneAlt, FaHistory, FaShieldAlt, FaLifeRing, FaCog, FaSignOutAlt, FaBars } from 'react-icons/fa';

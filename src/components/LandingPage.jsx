@@ -39,7 +39,7 @@
 
 
 // LandingPage.js (Updated version of the first page)
-import React from "react";
+// import React from "react";
 import { useNavigate } from "react-router-dom";
 
 function LandingPage() {
