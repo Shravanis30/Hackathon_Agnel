@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Map, { Marker, Popup } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { MapPin, Phone } from "lucide-react";
@@ -8,11 +8,11 @@ import SidebarWithNavbar from "./SidebarWithNavbar";
 const MAPBOX_TOKEN = "pk.eyJ1IjoidGVqYXMxOTM2IiwiYSI6ImNtNXk1b3p6aTBmN3oycW45anIxeGIyeGYifQ.g8zrtImUGHjJyyp0vn1fmA"; // Replace with your Mapbox token
 
 export default function Home() {
-  const [currentLocation, setCurrentLocation] = useState({
-    latitude: 20.5937, // Default to India's center
-    longitude: 78.9629,
+  const [currentLocation] = useState({
+    latitude: 19.0755, // Default to India's center
+    longitude: 72.9913,
   });
-  const [locationReady, setLocationReady] = useState(false);
+  const [locationReady] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [videoBlob, setVideoBlob] = useState(null);
   const navigate = useNavigate();
@@ -21,6 +21,7 @@ export default function Home() {
   let recordingInterval;
   let locationInterval;
 
+  videoBlob ;
   const handleLocationSharingClick = () => {
     navigate("/locationSharing");
   };
@@ -77,7 +78,8 @@ export default function Home() {
 
         // Create a temporary file URL for the video
         const videoUrl = URL.createObjectURL(blob);
-
+        console.log(videoUrl);
+        
         // Send the video to Discord
         const formData = new FormData();
         formData.append("file", blob, "video.webm");
