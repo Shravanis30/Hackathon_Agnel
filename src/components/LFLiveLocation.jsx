@@ -1,66 +1,46 @@
-// import React from "react";
-
-// function LiveLocation() {
-//   return (
-//     <div className="min-h-screen bg-gradient-to-b from-blue-800 via-blue-600 to-blue-300 text-white flex flex-col items-center justify-center text-center p-4">
-//       <img
-//         src="https://source.unsplash.com/400x400/?location,tracking"
-//         alt="Live Location"
-//         className="w-60 h-60 mb-4 rounded-lg shadow-lg"
-//       />
-//       <h2 className="text-3xl font-bold mb-2">Live Location Sharing & Tracking</h2>
-//       <p className="text-lg">
-//         Share your real-time location with trusted contacts and enable seamless
-//         tracking for added safety.
-//       </p>
-//     </div>
-//   );
-// }
-
-// export default LiveLocation;
-
-
-
-
-
-// LFLiveLocation.js (Third page)
-// import React from "react";
 import { useNavigate } from "react-router-dom";
 
 function LFLiveLocation() {
   const navigate = useNavigate();
 
   const handleSkip = () => {
-    navigate("/accountPage"); // Navigate to the home page (SplashScreen)
+    navigate("/accountPage");
   };
 
   const handleNext = () => {
-    navigate("/emergency-contacts"); // Navigate to the next page (EmergencyContacts)
+    navigate("/emergency-contacts");
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-800 via-blue-600 to-blue-300 text-white flex flex-col items-center justify-center text-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-rose-400 via-pink-300 to-blue-200 text-rose-900 flex flex-col items-center justify-center text-center p-6 relative">
+      {/* Animated Location Image */}
       <img
         src="https://source.unsplash.com/400x400/?location,tracking"
         alt="Live Location"
-        className="w-60 h-60 mb-4 rounded-lg shadow-lg"
+        className="w-60 h-60 mb-4 rounded-lg shadow-lg transform transition-transform duration-700 hover:scale-110 animate__animated animate__zoomIn"
       />
-      <h2 className="text-3xl font-bold mb-2">Live Location Sharing & Tracking</h2>
-      <p className="text-lg">
-        Share your real-time location with trusted contacts and enable seamless
-        tracking for added safety.
+
+      {/* Heading with animation */}
+      <h2 className="text-3xl font-extrabold mb-3 animate__animated animate__fadeInDown">
+        Live Location Sharing & Tracking
+      </h2>
+
+      {/* Description with subtle animation */}
+      <p className="text-lg mb-6 opacity-80 animate__animated animate__fadeInUp">
+        Share your real-time location with trusted contacts and enable seamless tracking for added safety.
       </p>
 
-      <div className="absolute bottom-4 flex space-x-4">
+      {/* Animated Buttons */}
+      <div className="absolute bottom-8 flex space-x-20 animate__animated animate__fadeIn">
         <button
           onClick={handleSkip}
-          className="bg-red-500 text-white py-2 px-6 rounded-md"
+          className="bg-rose-500 hover:bg-rose-600 text-white py-2 px-6 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105"
         >
           Skip
         </button>
         <button
           onClick={handleNext}
-          className="bg-green-500 text-white py-2 px-6 rounded-md"
+          className="bg-rose-500 hover:bg-rose-600 text-white py-2 px-6 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105"
         >
           Next
         </button>

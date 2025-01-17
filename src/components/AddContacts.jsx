@@ -112,7 +112,7 @@
 
 
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { UserPlus, Trash, Phone, ArrowRight } from "lucide-react";
 
 export default function AddContacts() {

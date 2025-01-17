@@ -278,9 +278,76 @@
 
 // export default AccountPage;
 
+// import React from "react";
+// import { useNavigate } from "react-router-dom";
+// import { getAuth, GoogleAuthProvider, getRedirectResult, signInWithRedirect } from "firebase/auth";
+// import { app } from "../firebase"; // Import the initialized Firebase app
+
+// const auth = getAuth(app); // Initialize auth with the Firebase app
+// const googleProvider = new GoogleAuthProvider();
+
+// function AccountPage() {
+//   const navigate = useNavigate();
+
+
+//   // Handle the redirect result
+//   React.useEffect(() => {
+//     getRedirectResult(auth)
+//       .then((result) => {
+//         if (result) {
+//           console.log("User signed in:", result.user);
+//         }
+//       })
+//       .catch((error) => {
+//         console.error("Error handling redirect result:", error);
+//       });
+//   }, []);
+
+//   return (
+//     <div className="flex flex-col items-center justify-center h-screen bg-blue-600 text-white">
+//       <div className="flex items-center justify-center mb-6">
+//         <img src="/path-to-logo.png" alt="SafeGuardHer" className="w-20 h-20" />
+//       </div>
+//       <h1 className="text-3xl font-bold mb-6">SafeGuardHer</h1>
+//       <div className="mb-6">
+//         <img src="/path-to-illustration.png" alt="Illustration" className="w-60 h-60" />
+//       </div>
+//       <button
+//         onClick={() => navigate("/loginPage")}
+//         className="bg-pink-500 px-8 py-3 rounded-full mb-4 text-white font-semibold shadow-md hover:bg-pink-600"
+//       >
+//         Login
+//       </button>
+//       <button
+//           onClick={() => navigate("/signUp")}
+//         className="bg-blue-800 px-8 py-3 rounded-full text-white font-semibold shadow-md hover:bg-blue-700"
+//       >
+//           Sign up 
+//       </button>
+      
+//     </div>
+//   );
+// }
+
+// export default AccountPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { getAuth, GoogleAuthProvider, getRedirectResult, signInWithRedirect } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, getRedirectResult } from "firebase/auth";
 import { app } from "../firebase"; // Import the initialized Firebase app
 
 const auth = getAuth(app); // Initialize auth with the Firebase app
@@ -288,10 +355,6 @@ const googleProvider = new GoogleAuthProvider();
 
 function AccountPage() {
   const navigate = useNavigate();
-
-  const signupWithGoogle = () => {
-    signInWithRedirect(auth, googleProvider);
-  };
 
   // Handle the redirect result
   React.useEffect(() => {
@@ -307,32 +370,36 @@ function AccountPage() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-blue-600 text-white">
+    <div className="flex flex-col items-center justify-center h-screen bg-white text-gray-800">
+      {/* Logo Section */}
       <div className="flex items-center justify-center mb-6">
         <img src="/path-to-logo.png" alt="SafeGuardHer" className="w-20 h-20" />
       </div>
-      <h1 className="text-3xl font-bold mb-6">SafeGuardHer</h1>
+      
+      {/* App Title */}
+      <h1 className="text-3xl font-bold text-pink-600 mb-6">SafeGuardHer</h1>
+      
+      {/* Illustration Section */}
       <div className="mb-6">
         <img src="/path-to-illustration.png" alt="Illustration" className="w-60 h-60" />
       </div>
-      <button
-        onClick={() => navigate("/loginPage")}
-        className="bg-pink-500 px-8 py-3 rounded-full mb-4 text-white font-semibold shadow-md hover:bg-pink-600"
-      >
-        Login
-      </button>
-      <button
-        onClick={signupWithGoogle}
-        className="bg-blue-800 px-8 py-3 rounded-full text-white font-semibold shadow-md hover:bg-blue-700"
-      >
-        Continue using Google
-      </button>
-      <p className="mt-6">
-        Don&apos;t have an account?{" "}
-        <span onClick={() => navigate("/signUp")} className="text-pink-500 cursor-pointer underline">
-          Sign up here
-        </span>
-      </p>
+      
+      {/* Buttons */}
+      <div className="flex flex-col items-center space-y-4">
+        <button
+          onClick={() => navigate("/loginPage")}
+          className="bg-pink-600 text-white px-10 py-3 rounded-full font-semibold shadow-md hover:bg-pink-700 transition-all"
+        >
+          Login
+        </button>
+
+        <button
+          onClick={() => navigate("/signUp")}
+          className="bg-white text-pink-600 border-2 border-pink-600 px-9 py-3 rounded-full font-semibold shadow-md hover:bg-pink-600 hover:text-white transition-all"
+        >
+          Sign up
+        </button>
+      </div>
     </div>
   );
 }

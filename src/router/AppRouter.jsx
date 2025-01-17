@@ -7,7 +7,6 @@ import LFGestureSOS from "../components/LFGestureSOS";
 import LFLiveLocation from "../components/LFLiveLocation";
 import LFEmergencyContacts from "../components/LFEmergencyContacts";
 import LFHiddenCamera from "../components/LFHiddenCamera";
-import LFLiveAudio from "../components/LFLiveAudio";
 import LFAlertBell from "../components/LFAlertBell";
 import LandingPage from "../components/LandingPage";
 
@@ -40,7 +39,6 @@ function AppRouter() {
       <Route path="/live-location" element={<LFLiveLocation />} />
       <Route path="/emergency-contacts" element={<LFEmergencyContacts />} />
       <Route path="/hidden-camera" element={<LFHiddenCamera />} />
-      <Route path="/live-audio" element={<LFLiveAudio />} />
       <Route path="/alert-bell" element={<LFAlertBell />} />
 
 

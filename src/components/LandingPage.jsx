@@ -38,8 +38,52 @@
 
 
 
-// LandingPage.js (Updated version of the first page)
-// import React from "react";
+// // LandingPage.js (Updated version of the first page)
+// // import React from "react";
+// import { useNavigate } from "react-router-dom";
+
+// function LandingPage() {
+//   const navigate = useNavigate();
+
+//   const handleNext = () => {
+//     navigate("/gesture-sos"); // Navigate to the next page (GestureSOS)
+//   };
+
+//   return (
+//     <div className="flex flex-col h-screen items-center justify-center bg-[#4c1631] text-white">
+//       <div className="flex items-center justify-center mb-4">
+//         <img
+//           src="/path-to-your-logo.png"
+//           alt="SafeGuardHer Logo"
+//           className="w-20 h-20 md:w-28 md:h-28 animate-bounce"
+//         />
+//       </div>
+
+//       <h1 className="text-4xl md:text-6xl font-bold tracking-wide mb-2">
+//         SafAura
+//       </h1>
+//       <p className="text-md md:text-xl tracking-wide">Women Safety App</p>
+
+      
+
+//       <div className="absolute bottom-4 flex space-x-4">
+    
+//         <button
+//           onClick={handleNext}
+//           className="bg-green-500 text-white py-2 px-6 rounded-md"
+//         >
+//           Next
+//         </button>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default LandingPage;
+
+
+
+
 import { useNavigate } from "react-router-dom";
 
 function LandingPage() {
@@ -50,29 +94,34 @@ function LandingPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen items-center justify-center bg-[#4c1631] text-white">
-      <div className="flex items-center justify-center mb-4">
+    <div className="flex flex-col h-screen items-center justify-center bg-gradient-to-b from-rose-400 via-pink-300 to-blue-200 text-rose-900">
+      {/* Logo Section */}
+      <div className="flex items-center justify-center mb-4 animate-fadeIn">
         <img
           src="/path-to-your-logo.png"
           alt="SafeGuardHer Logo"
-          className="w-20 h-20 md:w-28 md:h-28 animate-bounce"
+          className="w-20 h-20 md:w-28 md:h-28 animate-bounce drop-shadow-lg"
         />
       </div>
 
-      <h1 className="text-4xl md:text-6xl font-bold tracking-wide mb-2">
-        SafAura
+      {/* Title and Subtitle */}
+      <h1 className="text-5xl md:text-6xl font-bold tracking-wider mb-2 drop-shadow-md animate-fadeIn delay-200">
+        AngelWatch
       </h1>
-      <p className="text-md md:text-xl tracking-wide">Women Safety App</p>
+      <p className="text-xl md:text-2xl font-semibold tracking-wide drop-shadow-sm animate-fadeIn delay-400">
+        Your Safety, Our Priority
+      </p>
 
-      
+      {/* Decorative Divider (optional) */}
+      {/* <div className="w-2/3 h-1 bg-white rounded-full my-6 animate-fadeIn delay-600"></div> */}
 
-      <div className="absolute bottom-4 flex space-x-4">
-    
+      {/* Next Button */}
+      <div className="absolute bottom-8 flex space-x-4 animate__animated animate__fadeIn">
         <button
           onClick={handleNext}
-          className="bg-green-500 text-white py-2 px-6 rounded-md"
+          className="bg-rose-500 hover:bg-rose-600 text-white py-3 px-8 rounded-md shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-2xl"
         >
-          Next
+          Get Started
         </button>
       </div>
     </div>
