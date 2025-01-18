@@ -1196,6 +1196,350 @@
 //     </div>
 //   );
 // }
+
+
+
+
+
+
+
+
+
+// // main code 
+// import { useState, useEffect, useRef } from "react";
+// import { MapPin, Phone } from "lucide-react";
+// import Map, { Marker, Popup } from "react-map-gl";
+// import "mapbox-gl/dist/mapbox-gl.css";
+// import { useNavigate } from "react-router-dom";
+// import SidebarWithNavbar from "./SidebarWithNavbar"
+// import TidioChat from "../components/TidioChat";
+
+// const MAPBOX_TOKEN =
+//   "pk.eyJ1IjoidGVqYXMxOTM2IiwiYSI6ImNtNXk1b3p6aTBmN3oycW45anIxeGIyeGYifQ.g8zrtImUGHjJyyp0vn1fmA"; // Replace with your Mapbox token
+// const TELEGRAM_BOT_TOKEN =
+//   "7885100490:AAH_dz4DXJBQhZyQo2VfpoEfhjK5sMwLBEk"; // Your Telegram bot token
+// const TELEGRAM_CHAT_ID = "7329742224"; // Your Telegram chat ID
+// const DISCORD_WEBHOOK_URL =
+//   "https://discord.com/api/webhooks/1329138480764424294/ApXOIfyGBzZHmTwWjMJ5AVXh6C-VCOO6B51wenQq42J-S-mjjMMC8YhMnB0lpBE-U5WB"; // Your Discord webhook URL
+// export default function Home() {
+//   const lastClickTime = useRef(0); // Track the last click time
+//   const doubleClickThreshold = 300; // Time limit (in milliseconds) for double-click detection
+//   let shakeThreshold = 20; // Adjust this value based on the intensity of the shake
+
+//   const [currentLocation, setCurrentLocation] = useState({
+//     latitude: 20.5937, // Default to India's center
+//     longitude: 78.9629,
+//   });
+//   const [locationReady, setLocationReady] = useState(false);
+//   const [isRecording, setIsRecording] = useState(false);
+//   const [videoBlob, setVideoBlob] = useState(null);
+//   const navigate = useNavigate();
+
+//   let mediaRecorder = null;
+//   let videoChunks = [];
+//   let mediaStream = null;
+
+//   const handleLocationSharingClick = () => {
+//     navigate("/locationSharing");
+//   };
+
+//   const handleHelplineButtonClick = () => {
+//     navigate("/helpline");
+//   };
+
+//   const sendLocationToTelegram = async () => {
+//     const mapsLink = `https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}`;
+//     const message = `📍 **Live Location Update!**\nLatitude: ${currentLocation.latitude}\nLongitude: ${currentLocation.longitude}\n[View on Maps](${mapsLink})`;
+
+//     const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+//     try {
+//       const response = await fetch(telegramApiUrl, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({
+//           chat_id: TELEGRAM_CHAT_ID,
+//           text: message,
+//           parse_mode: "Markdown",
+//         }),
+//       });
+
+//       if (response.ok) {
+//         console.log("Location sent to Telegram successfully!");
+//       } else {
+//         console.error("Failed to send location to Telegram");
+//       }
+//     } catch (error) {
+//       console.error("Error sending location to Telegram:", error);
+//     }
+//   };
+
+//   const sendVideoToTelegram = async (blob) => {
+//     const formData = new FormData();
+//     formData.append("chat_id", TELEGRAM_CHAT_ID);
+//     formData.append("video", blob, "video.webm");
+
+//     const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`;
+
+//     try {
+//       const response = await fetch(telegramApiUrl, {
+//         method: "POST",
+//         body: formData,
+//       });
+
+//       if (response.ok) {
+//         console.log("Video sent to Telegram successfully!");
+//       } else {
+//         console.error("Failed to send video to Telegram");
+//       }
+//     } catch (error) {
+//       console.error("Error sending video to Telegram:", error);
+//     }
+//   };
+
+//   // const startRecording = async () => {
+//   //   try {
+//   //     mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+//   //     console.log("Camera access granted!");
+
+//   //     mediaRecorder = new MediaRecorder(mediaStream);
+//   //     videoChunks = [];
+
+//   //     mediaRecorder.ondataavailable = (event) => {
+//   //       if (event.data.size > 0) {
+//   //         videoChunks.push(event.data);
+//   //       }
+//   //     };
+
+//   //     mediaRecorder.onstop = async () => {
+//   //       const blob = new Blob(videoChunks, { type: "video/webm" });
+//   //       setVideoBlob(blob);
+//   //       await sendVideoToTelegram(blob);
+//   //     };
+
+//   //     mediaRecorder.start();
+//   //     setIsRecording(true);
+//   //     console.log("Recording started!");
+//   //   } catch (error) {
+//   //     console.error("Error starting recording:", error.message);
+//   //   }
+//   // };
+
+//   // const stopRecording = () => {
+//   //   if (mediaRecorder && mediaRecorder.state === "recording") {
+//   //     mediaRecorder.stop();
+//   //     setIsRecording(false);
+//   //     console.log("Recording stopped.");
+//   //     mediaStream.getTracks().forEach((track) => track.stop());
+//   //   }
+//   // };
+//   const startRecording = async () => {
+//     try {
+//       mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+//       mediaRecorder = new MediaRecorder(mediaStream);
+//       mediaRecorder.ondataavailable = (event) => {
+//         videoChunks.push(event.data);
+//       };
+
+//       mediaRecorder.onstop = async () => {
+//         const blob = new Blob(videoChunks, { type: "video/webm" });
+//         setVideoBlob(blob);
+//         videoChunks = [];
+//         sendVideoToTelegram(blob); // Send video to Telegram
+//       };
+
+//       mediaRecorder.start();
+//       setIsRecording(true);
+
+//       // Record for 10 seconds and send the video to Telegram
+//       videoSendInterval = setInterval(() => {
+//         if (mediaRecorder.state === "recording") {
+//           mediaRecorder.stop();
+//           mediaRecorder.start();
+//         }
+//       }, 10000); // Stop and start recording every 10 seconds
+
+//       // Share location every 10 seconds while recording
+//       locationInterval = setInterval(() => {
+//         sendLocationToTelegram();
+//       }, 10000); // Share location every 10 seconds
+//     } catch (error) {
+//       console.error("Error starting recording:", error);
+//     }
+//   };
+
+//   const stopRecording = () => {
+//     if (mediaRecorder && mediaRecorder.state === "recording") {
+//       clearInterval(recordingInterval); // Stop the recording interval
+//       clearInterval(locationInterval); // Stop location sharing interval
+//       clearInterval(videoSendInterval); // Stop video sending interval
+//       mediaRecorder.stop();
+//       setIsRecording(false); // Set the button back to SOS
+//       mediaStream.getTracks().forEach((track) => track.stop()); // Stop the camera stream
+//     }
+//   };
+
+//   const handleSOSButtonClick = async () => {
+//     const currentTime = Date.now();
+//     const timeDifference = currentTime - lastClickTime.current;
+
+//     if (timeDifference < doubleClickThreshold) {
+//       console.log("Button double-clicked!");
+
+//       if (isRecording) {
+//         stopRecording();
+//       } else {
+//         startRecording();
+//         await sendLocationToTelegram();
+//       }
+
+//       setIsRecording(!isRecording);
+//     }
+
+//     lastClickTime.current = currentTime;
+//   };
+
+//   // Power button detection simulation
+//   const handlePowerButtonPress = () => {
+//     powerButtonPressCount += 1;
+//     if (powerButtonPressCount >= 3) {
+//       handleSOSButtonClick();
+//       powerButtonPressCount = 0; // Reset after triggering SOS
+//     }
+//   };
+
+//   // Detect shaking of the device
+//   useEffect(() => {
+//     const handleShake = (event) => {
+//       const acceleration = event.accelerationIncludingGravity;
+//       const totalAcceleration = Math.sqrt(
+//         acceleration.x * acceleration.x +
+//         acceleration.y * acceleration.y +
+//         acceleration.z * acceleration.z
+//       );
+
+//       if (totalAcceleration > shakeThreshold) {
+//         handleSOSButtonClick();
+//       }
+//     };
+
+//     window.addEventListener("devicemotion", handleShake);
+
+//     return () => {
+//       window.removeEventListener("devicemotion", handleShake);
+//     };
+//   }, []);
+
+//   const getCurrentLocation = () => {
+//     if (navigator.geolocation) {
+//       navigator.geolocation.getCurrentPosition(
+//         (position) => {
+//           setCurrentLocation({
+//             latitude: position.coords.latitude,
+//             longitude: position.coords.longitude,
+//           });
+//           setLocationReady(true);
+//         },
+//         (error) => {
+//           console.error("Error getting location:", error.message);
+//         }
+//       );
+//     } else {
+//       alert("Geolocation is not supported by this browser.");
+//     }
+//   };
+
+//   useEffect(() => {
+//     getCurrentLocation();
+//   }, []);
+
+//   return (
+//     <div className="relative min-h-screen bg-gray-200">
+//       <SidebarWithNavbar />
+//       <div className="mt-16 px-4 md:px-8 flex-grow">
+//         <div className="w-full mb-4">
+//           <Map
+//             initialViewState={{
+//               latitude: currentLocation.latitude,
+//               longitude: currentLocation.longitude,
+//               zoom: 13,
+//             }}
+//             style={{ width: "100%", height: "100vh" }}
+//             mapStyle="mapbox://styles/mapbox/streets-v11"
+//             mapboxAccessToken={MAPBOX_TOKEN}
+//           >
+//             {locationReady && (
+//               <>
+//                 <Marker
+//                   latitude={currentLocation.latitude}
+//                   longitude={currentLocation.longitude}
+//                   anchor="bottom"
+//                 >
+//                   <MapPin className="text-red-500 w-6 h-6" />
+//                 </Marker>
+//                 <Popup
+//                   latitude={currentLocation.latitude}
+//                   longitude={currentLocation.longitude}
+//                   closeOnClick={false}
+//                   closeButton={true}
+//                   anchor="top"
+//                 >
+//                   <div>Your current location</div>
+//                 </Popup>
+//               </>
+//             )}
+//           </Map>
+//         </div>
+//         <div className="bg-white shadow-lg rounded-t-lg p-4 fixed bottom-0 left-0 right-0 z-50">
+//           <div className="flex justify-between items-center">
+//             <div
+//               className="bg-blue-600 text-white p-4 rounded-full cursor-pointer"
+//               onClick={handleLocationSharingClick}
+//             >
+//               <MapPin />
+//             </div>
+//             <button
+//               onClick={handleSOSButtonClick}
+//               className={`bg-red-600 text-white px-6 py-3 rounded-full ${isRecording ? "bg-red-800" : ""
+//                 }`}
+//             >
+//               {isRecording ? "Stop Recording" : "SOS"}
+//             </button>
+//             <div
+//               className="bg-blue-600 text-white p-4 rounded-full cursor-pointer"
+//               onClick={handleHelplineButtonClick}
+//             >
+//               <Phone />
+//             </div>
+//           </div>
+//         </div>
+//         <TidioChat />
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// main code 
 import { useState, useEffect, useRef } from "react";
 import { MapPin, Phone } from "lucide-react";
 import Map, { Marker, Popup } from "react-map-gl";
@@ -1203,6 +1547,9 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { useNavigate } from "react-router-dom";
 import SidebarWithNavbar from "./SidebarWithNavbar"
 import TidioChat from "../components/TidioChat";
+import { FaBell } from "react-icons/fa"; // Bell icon from react-icons
+import buzzer from "../assets/buzzer.mp3"
+
 
 const MAPBOX_TOKEN =
   "pk.eyJ1IjoidGVqYXMxOTM2IiwiYSI6ImNtNXk1b3p6aTBmN3oycW45anIxeGIyeGYifQ.g8zrtImUGHjJyyp0vn1fmA"; // Replace with your Mapbox token
@@ -1400,6 +1747,40 @@ export default function Home() {
     }
   };
 
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null); // Reference for the audio instance
+
+  const handleAlert = async () => {
+    // Play alert sound
+    if (!isPlaying) {
+      try {
+        audioRef.current = new Audio(buzzer);
+        await audioRef.current.play();
+        setIsPlaying(true);
+
+        // Reset when audio ends
+        audioRef.current.onended = () => setIsPlaying(false);
+      } catch (error) {
+        console.error('Error playing audio:', error);
+        setIsPlaying(false);
+      }
+    } else {
+      // Stop the alert sound if it's already playing
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
+      setIsPlaying(false);
+    }
+
+    // Trigger the Firebase Cloud Function
+    try {
+      const triggerAlert = httpsCallable(functions, 'triggerAlert');
+      await triggerAlert({ userId: 'exampleUserId123' });
+      console.log('Alert triggered successfully in the background.');
+    } catch (error) {
+      console.error('Error triggering alert:', error);
+      alert('Failed to trigger alert in the background.');
+    }
+  };
   // Detect shaking of the device
   useEffect(() => {
     const handleShake = (event) => {
@@ -1492,7 +1873,7 @@ export default function Home() {
             </div>
             <button
               onClick={handleSOSButtonClick}
-              className={`bg-red-600 text-white px-6 py-3 rounded-full ${isRecording ? "bg-red-800" : ""
+              className={`bg-red-600 text-white p-4 rounded-full ${isRecording ? "bg-red-800" : ""
                 }`}
             >
               {isRecording ? "Stop Recording" : "SOS"}
@@ -1503,9 +1884,19 @@ export default function Home() {
             >
               <Phone />
             </div>
+            <button
+              onClick={handleAlert}
+              className="bg-blue-600 text-white p-5 rounded-full cursor-pointer"
+            >
+              <FaBell />
+            </button>
+            <div  className="bg-blue-600 text-white p-4 rounded-full cursor-pointer"
+            >
+            <TidioChat />
+
+            </div>
           </div>
         </div>
-        <TidioChat />
       </div>
     </div>
   );

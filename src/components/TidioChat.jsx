@@ -45,7 +45,7 @@ const TidioChat = () => {
         {`
           #tidio-chat {
             position: fixed !important;
-            bottom: 92px !important; /* 20 pixels above the bottom */
+            bottom: 0px !important; /* 20 pixels above the bottom */
             right: 20px !important; /* 20 pixels from the right edge */
             z-index: 1000 !important; /* Ensure it's above other elements */
           }
