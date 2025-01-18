@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import LiveLocation from "../assets/LiveLocation.png";
 
 function LFLiveLocation() {
   const navigate = useNavigate();
@@ -15,10 +16,10 @@ function LFLiveLocation() {
     <div className="min-h-screen bg-gradient-to-b from-rose-400 via-pink-300 to-blue-200 text-rose-900 flex flex-col items-center justify-center text-center p-6 relative">
       {/* Animated Location Image */}
       <img
-        src="https://source.unsplash.com/400x400/?location,tracking"
+        src={LiveLocation}
         alt="Live Location"
-        className="w-60 h-60 mb-4 rounded-lg shadow-lg transform transition-transform duration-700 hover:scale-110 animate__animated animate__zoomIn"
-      />
+        className="h-64 mb-4 rounded-lg transform transition-transform duration-700 hover:scale-110 animate__animated animate__zoomIn"
+      /> 
 
       {/* Heading with animation */}
       <h2 className="text-3xl font-extrabold mb-3 animate__animated animate__fadeInDown">
@@ -31,7 +32,7 @@ function LFLiveLocation() {
       </p>
 
       {/* Animated Buttons */}
-      <div className="absolute bottom-8 flex space-x-20 animate__animated animate__fadeIn">
+      <div className="absolute bottom-8 flex space-x-44 animate__animated animate__fadeIn">
         <button
           onClick={handleSkip}
           className="bg-rose-500 hover:bg-rose-600 text-white py-2 px-6 rounded-md transition-all duration-300 ease-in-out transform hover:scale-105"

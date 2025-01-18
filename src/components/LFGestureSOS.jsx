@@ -25,6 +25,7 @@
 
 import { useNavigate } from "react-router-dom";
 import 'animate.css'; // Importing animate.css for animations
+import SOS from "../assets/SOS.png"
 
 function LFGestureSOS() {
   const navigate = useNavigate();
@@ -41,9 +42,9 @@ function LFGestureSOS() {
     <div className="min-h-screen bg-gradient-to-b from-rose-400 via-pink-300 to-blue-200 text-rose-900 flex flex-col items-center justify-center text-center p-6 relative overflow-hidden">
       {/* Animated Image */}
       <img
-        src="https://source.unsplash.com/400x400/?gesture,alert"
+        src={SOS}
         alt="Gesture SOS"
-        className="w-60 h-60 mb-6 rounded-lg shadow-lg animate__animated animate__zoomIn"
+        className="w-60 h-60 mb-6 rounded-lg  animate__animated animate__zoomIn"
       />
 
       {/* Title */}

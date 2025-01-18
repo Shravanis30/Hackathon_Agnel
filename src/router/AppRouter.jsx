@@ -10,7 +10,7 @@ import LFHiddenCamera from "../components/LFHiddenCamera";
 import LFAlertBell from "../components/LFAlertBell";
 import LandingPage from "../components/LandingPage";
 
-
+import IAlertBell from "../components/IAlertBell";
 
 import HomeMain from '../components/HomeMain'
 import AccountPage from '../components/AccountPage'
@@ -24,6 +24,11 @@ import Helpline from "../components/Helpline";
 import LocationSharing from "../components/LocationSharing";
 
 import SidebarWithNavbar from "../components/SidebarWithNavbar";
+import RecordingHistory from "../components/RecordingHistory";
+import Profile from "../components/Profile";
+import SafetyTips from "../components/SafetyTip";
+import SettingSection from "../components/SettingSection"
+import HelpSection from "../components/HelpSection"
 
 
 
@@ -55,8 +60,12 @@ function AppRouter() {
       <Route path="/locationSharing" element={<LocationSharing />} />
 
       <Route path="/sidebarWithNavbar" element={<SidebarWithNavbar />} />
-
-
+      <Route path="/recording-history" element={<RecordingHistory />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/safety-tips" element={<SafetyTips />} />
+      <Route path="/helpSection" element={<HelpSection />} />
+      <Route path="/iAlertBell" element={<IAlertBell />} />
+      <Route path="/settingSection" element={<SettingSection />} />
 
     </Routes>
   );

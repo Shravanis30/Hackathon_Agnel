@@ -65,11 +65,11 @@ const SidebarWithNavbar = () => {
             <FaShieldAlt />
             <span>Safety Tips</span>
           </li>
-          <li className="flex items-center space-x-3 cursor-pointer" onClick={() => handleNavigate('/help')}>
+          <li className="flex items-center space-x-3 cursor-pointer" onClick={() => handleNavigate('/helpSection')}>
             <FaLifeRing />
             <span>Help</span>
           </li>
-          <li className="flex items-center space-x-3 cursor-pointer" onClick={() => handleNavigate('/settings')}>
+          <li className="flex items-center space-x-3 cursor-pointer" onClick={() => handleNavigate('/settingSection')}>
             <FaCog />
             <span>Settings</span>
           </li>

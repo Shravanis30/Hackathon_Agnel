@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Navbar from './Navbar';
 
 const helplines = [
   { name: 'NATIONAL EMERGENCY NUMBER', number: '112' },
@@ -49,30 +50,56 @@ const Helpline = () => {
   };
 
   return (
-    <div className="p-4 bg-gray-100 min-h-screen">
-
-
-      {/* Emergency Helpline Numbers */}
-      <h2 className="text-3xl font-semibold text-center mb-6">Emergency Helpline Numbers</h2>
-
-
-      {/* Search Bar */}
-      <div className="mb-4">
-        <input
-          type="text"
-          placeholder="Search for a helpline..."
-          value={searchTerm}
-          onChange={handleSearch}
-          className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+    <div>
+      <div>
+          <Navbar />
       </div>
+      <div className="mt-20 p-4 bg-gray-100 min-h-screen">
 
-      {/* Display filtered results */}
-      {searchTerm && (
-        <div className="mb-6">
-          <h3 className="text-xl font-semibold text-gray-700">Search Results:</h3>
-          <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredHelplines.map((helpline, index) => (
+
+        {/* Emergency Helpline Numbers */}
+        <h2 className="text-3xl font-semibold text-center mb-6">Emergency Helpline Numbers</h2>
+
+
+        {/* Search Bar */}
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="Search for a helpline..."
+            value={searchTerm}
+            onChange={handleSearch}
+            className="w-full p-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Display filtered results */}
+        {searchTerm && (
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold text-gray-700">Search Results:</h3>
+            <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredHelplines.map((helpline, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-lg p-4 flex justify-between items-center space-x-4">
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-gray-800">{helpline.name}</h3>
+                    <p className="text-sm text-gray-600">{helpline.number}</p>
+                  </div>
+                  <button
+                    onClick={() => handleCall(helpline.number)}
+                    className="text-red-500 text-3xl p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition duration-200"
+                  >
+                    📞
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredHelplines.length === 0 ? (
+            <p className="text-center text-gray-500 col-span-3">No helplines found</p>
+          ) : (
+            filteredHelplines.map((helpline, index) => (
               <div key={index} className="bg-white rounded-lg shadow-lg p-4 flex justify-between items-center space-x-4">
                 <div className="flex-1">
                   <h3 className="text-xl font-bold text-gray-800">{helpline.name}</h3>
@@ -85,32 +112,12 @@ const Helpline = () => {
                   📞
                 </button>
               </div>
-            ))}
-          </div>
+            ))
+          )}
         </div>
-      )}
-
-      <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredHelplines.length === 0 ? (
-          <p className="text-center text-gray-500 col-span-3">No helplines found</p>
-        ) : (
-          filteredHelplines.map((helpline, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-lg p-4 flex justify-between items-center space-x-4">
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-gray-800">{helpline.name}</h3>
-                <p className="text-sm text-gray-600">{helpline.number}</p>
-              </div>
-              <button
-                onClick={() => handleCall(helpline.number)}
-                className="text-red-500 text-3xl p-2 rounded-full bg-gray-200 hover:bg-gray-300 transition duration-200"
-              >
-                📞
-              </button>
-            </div>
-          ))
-        )}
       </div>
     </div>
+
   );
 };
 

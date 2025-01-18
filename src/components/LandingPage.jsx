@@ -64,10 +64,10 @@
 //       </h1>
 //       <p className="text-md md:text-xl tracking-wide">Women Safety App</p>
 
-      
+
 
 //       <div className="absolute bottom-4 flex space-x-4">
-    
+
 //         <button
 //           onClick={handleNext}
 //           className="bg-green-500 text-white py-2 px-6 rounded-md"
@@ -85,6 +85,7 @@
 
 
 import { useNavigate } from "react-router-dom";
+import logo from "../assets/logo.png"
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -98,9 +99,9 @@ function LandingPage() {
       {/* Logo Section */}
       <div className="flex items-center justify-center mb-4 animate-fadeIn">
         <img
-          src="/path-to-your-logo.png"
-          alt="SafeGuardHer Logo"
-          className="w-20 h-20 md:w-28 md:h-28 animate-bounce drop-shadow-lg"
+          src={logo}
+          alt="AngelWatch Logo"
+          className="h-64 md:h-50 animate-zoomInOut drop-shadow-lg"
         />
       </div>
 

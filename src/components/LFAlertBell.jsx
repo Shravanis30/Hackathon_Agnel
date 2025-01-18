@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
+import AlertBellImage from "../assets/AlertBellImage.png"; // Renamed import
 
-function AlertBell() {
+function AlertBellComponent() {
   const navigate = useNavigate();
 
   const handleSkip = () => {
-    navigate("/accountPage"); // Navigate to the home page (SplashScreen)
+    navigate("/accountPage"); // Navigate to the account page
   };
 
   const handleNext = () => {
@@ -15,9 +16,9 @@ function AlertBell() {
     <div className="min-h-screen bg-gradient-to-b from-rose-400 via-pink-300 to-blue-200 text-rose-900 flex flex-col items-center justify-center text-center p-4 relative">
       {/* Animated Alert Bell Image */}
       <img
-        src="https://source.unsplash.com/400x400/?bell,alert"
+        src={AlertBellImage} // Use the renamed variable
         alt="Alert Bell"
-        className="w-60 h-60 mb-4 rounded-lg shadow-lg transform transition-transform duration-700 hover:scale-110 animate__animated animate__zoomIn"
+        className="h-72 mb-4 rounded-lg transform transition-transform duration-700 hover:scale-110 animate__animated animate__zoomIn"
       />
 
       {/* Heading with animation */}
@@ -49,4 +50,4 @@ function AlertBell() {
   );
 }
 
-export default AlertBell;
+export default AlertBellComponent;

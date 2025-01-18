@@ -1,278 +1,6 @@
-import { useState, useEffect } from "react";
-import { MapPin, Phone } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import Map, { Marker, Popup } from "react-map-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
-import SidebarWithNavbar from "./SidebarWithNavbar";
-
-const MAPBOX_TOKEN = "pk.eyJ1IjoidGVqYXMxOTM2IiwiYSI6ImNtNXk1b3p6aTBmN3oycW45anIxeGIyeGYifQ.g8zrtImUGHjJyyp0vn1fmA"; // Replace with your Mapbox token
-
-export default function Home() {
-  const [currentLocation, setCurrentLocation] = useState({
-    latitude: 20.5937, // Default to India's center
-    longitude: 78.9629,
-  });
-  const [locationReady, setLocationReady] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
-  const [videoBlob, setVideoBlob] = useState(null);
-  const navigate = useNavigate();
-  let mediaRecorder;
-  let videoChunks = [];
-  let recordingInterval;
-  let locationInterval;
-  let mediaStream;
-  let powerButtonPressCount = 0;
-  let shakeThreshold = 20; // Adjust this value based on the intensity of the shake
-
-  const handleLocationSharingClick = () => {
-    navigate("/locationSharing");
-  };
-
-  const handleHelplineButtonClick = () => {
-    navigate("/helpline");
-  };
-
-  const sendLocationToDiscord = async () => {
-    const mapsLink = `https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}`;
-    const message = {
-      content: `📍 **Live Location Update!**\nLatitude: ${currentLocation.latitude}\nLongitude: ${currentLocation.longitude}\nView on Maps: [Click Here](${mapsLink})`,
-    };
-
-    const DISCORD_WEBHOOK_URL =
-      "https://discord.com/api/webhooks/1329138480764424294/ApXOIfyGBzZHmTwWjMJ5AVXh6C-VCOO6B51wenQq42J-S-mjjMMC8YhMnB0lpBE-U5WB";
-
-    try {
-      const response = await fetch(DISCORD_WEBHOOK_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(message),
-      });
-
-      if (response.ok) {
-        console.log("Location shared successfully!");
-      } else {
-        throw new Error("Failed to share location");
-      }
-    } catch (error) {
-      console.error("Error sharing location:", error);
-    }
-  };
-
-  const startRecording = async () => {
-    try {
-      mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
-      mediaRecorder = new MediaRecorder(mediaStream);
-      mediaRecorder.ondataavailable = (event) => {
-        videoChunks.push(event.data);
-      };
-
-      mediaRecorder.onstop = async () => {
-        const blob = new Blob(videoChunks, { type: "video/webm" });
-        setVideoBlob(blob);
-        videoChunks = [];
-        const videoUrl = URL.createObjectURL(blob);
-        // Send the video to Discord
-        const formData = new FormData();
-        formData.append("file", blob, "video.webm");
-
-        const DISCORD_WEBHOOK_URL =
-      "https://discord.com/api/webhooks/1329138480764424294/ApXOIfyGBzZHmTwWjMJ5AVXh6C-VCOO6B51wenQq42J-S-mjjMMC8YhMnB0lpBE-U5WB";
-
-      const response = await fetch(DISCORD_WEBHOOK_URL, {
-          method: "POST",
-          body: formData,
-        });
-
-        if (response.ok) {
-          console.log("Video sent to Discord successfully!");
-        } else {
-          console.log("Failed to send video to Discord.");
-        }
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-
-      // Record for 10 seconds and send the video to Discord
-      recordingInterval = setInterval(() => {
-        if (mediaRecorder.state === "recording") {
-          mediaRecorder.stop();
-          mediaRecorder.start();
-        }
-      }, 10000); // Stop and start recording every 10 seconds
-
-      // Share location every 10 seconds while recording
-      locationInterval = setInterval(() => {
-        sendLocationToDiscord();
-      }, 10000); // Share location every 10 seconds
-    } catch (error) {
-      console.error("Error starting recording:", error);
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder && mediaRecorder.state === "recording") {
-      clearInterval(recordingInterval); // Stop the recording interval
-      clearInterval(locationInterval); // Stop location sharing interval
-      mediaRecorder.stop();
-      setIsRecording(false); // Set the button back to SOS
-      mediaStream.getTracks().forEach(track => track.stop()); // Stop the camera stream
-    }
-  };
-
-  const handleSOSButtonClick = async () => {
-    if (isRecording) {
-      // Stop recording and stop location sharing
-      stopRecording();
-    } else {
-      // Start recording and start sharing location
-      startRecording();
-      await sendLocationToDiscord(); // Send initial location
-    }
-  };
-
-  // Get user's current location using geolocation
-  const getCurrentLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setCurrentLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-          });
-          setLocationReady(true);
-        },
-        (error) => {
-          console.error("Error getting location: ", error);
-        }
-      );
-    } else {
-      alert("Geolocation is not supported by this browser.");
-    }
-  };
-
-  // Power button detection simulation
-  const handlePowerButtonPress = () => {
-    powerButtonPressCount += 1;
-    if (powerButtonPressCount >= 3) {
-      handleSOSButtonClick();
-      powerButtonPressCount = 0; // Reset after triggering SOS
-    }
-  };
-
-  // Detect shaking of the device
-  useEffect(() => {
-    const handleShake = (event) => {
-      const acceleration = event.accelerationIncludingGravity;
-      const totalAcceleration = Math.sqrt(
-        acceleration.x * acceleration.x +
-        acceleration.y * acceleration.y +
-        acceleration.z * acceleration.z
-      );
-
-      if (totalAcceleration > shakeThreshold) {
-        handleSOSButtonClick();
-      }
-    };
-
-    window.addEventListener("devicemotion", handleShake);
-
-    return () => {
-      window.removeEventListener("devicemotion", handleShake);
-    };
-  }, []);
-
-  useEffect(() => {
-    getCurrentLocation(); // Get the user's current location when the component mounts
-  }, []);
-
-  return (
-    <div className="relative min-h-screen bg-gray-200">
-      <SidebarWithNavbar />
-
-      <div className="mt-16 px-4 md:px-8 flex-grow">
-        <div className="w-full mb-4">
-          <Map
-            initialViewState={{
-              latitude: currentLocation.latitude,
-              longitude: currentLocation.longitude,
-              zoom: 13,
-            }}
-            style={{ width: "100%", height: "60vh" }}
-            mapStyle="mapbox://styles/mapbox/streets-v11"
-            mapboxAccessToken={MAPBOX_TOKEN}
-          >
-            {locationReady && (
-              <>
-                <Marker
-                  latitude={currentLocation.latitude}
-                  longitude={currentLocation.longitude}
-                  anchor="bottom"
-                >
-                  <MapPin className="text-red-500 w-6 h-6" />
-                </Marker>
-                <Popup
-                  latitude={currentLocation.latitude}
-                  longitude={currentLocation.longitude}
-                  closeOnClick={false}
-                  closeButton={true}
-                  anchor="top"
-                >
-                  <div>Your current location</div>
-                </Popup>
-              </>
-            )}
-          </Map>
-        </div>
-
-        <div className="w-full flex justify-between items-center p-4 bg-transparent fixed bottom-0 left-0 md:left-1/2 transform md:-translate-x-1/2 z-50">
-          <div className="flex flex-col items-center">
-            <div
-              className="flex justify-center items-center bg-white shadow-md rounded-full w-14 h-14 cursor-pointer"
-              onClick={handleLocationSharingClick}
-            >
-              <MapPin className="w-6 h-6 text-gray-700" />
-            </div>
-            <span className="text-xs text-gray-600 mt-2">Share Location</span>
-          </div>
-
-          <div className="flex justify-center items-center">
-            <button
-              className={`bg-red-600 text-white font-bold text-sm px-6 py-6 rounded-full shadow-lg hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-4 focus:ring-red-300 ${isRecording ? "bg-red-800" : ""}`}
-              aria-label="SOS Button"
-              onClick={handleSOSButtonClick}
-            >
-              {isRecording ? "Stop Recording" : "SOS"}
-            </button>
-          </div>
-
-          <div className="flex flex-col items-center">
-            <div
-              onClick={handleHelplineButtonClick}
-              className="flex justify-center items-center bg-white shadow-md rounded-full w-14 h-14 cursor-pointer"
-            >
-              <Phone className="w-6 h-6 text-gray-700" />
-            </div>
-            <span className="text-xs text-gray-600 mt-2">Helpline</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 
 
-
-
-
-
-
-
-
-// infinity sending of the videos and lcoation
 
 // import { useState, useEffect } from "react";
 // import { MapPin, Phone } from "lucide-react";
@@ -281,7 +9,13 @@ export default function Home() {
 // import "mapbox-gl/dist/mapbox-gl.css";
 // import SidebarWithNavbar from "./SidebarWithNavbar";
 
-// const MAPBOX_TOKEN = "pk.eyJ1IjoidGVqYXMxOTM2IiwiYSI6ImNtNXk1b3p6aTBmN3oycW45anIxeGIyeGYifQ.g8zrtImUGHjJyyp0vn1fmA"; // Replace with your Mapbox token
+// const MAPBOX_TOKEN =
+//   "pk.eyJ1IjoidGVqYXMxOTM2IiwiYSI6ImNtNXk1b3p6aTBmN3oycW45anIxeGIyeGYifQ.g8zrtImUGHjJyyp0vn1fmA"; // Replace with your Mapbox token
+// const TELEGRAM_BOT_TOKEN =
+//   "7885100490:AAH_dz4DXJBQhZyQo2VfpoEfhjK5sMwLBEk"; // Your Telegram bot token
+// const TELEGRAM_CHAT_ID = "7329742224"; // Your Telegram chat ID
+// const DISCORD_WEBHOOK_URL =
+//   "https://discord.com/api/webhooks/1329138480764424294/ApXOIfyGBzZHmTwWjMJ5AVXh6C-VCOO6B51wenQq42J-S-mjjMMC8YhMnB0lpBE-U5WB"; // Your Discord webhook URL
 
 // export default function Home() {
 //   const [currentLocation, setCurrentLocation] = useState({
@@ -296,7 +30,10 @@ export default function Home() {
 //   let videoChunks = [];
 //   let recordingInterval;
 //   let locationInterval;
+//   let videoSendInterval;
 //   let mediaStream;
+//   let powerButtonPressCount = 0;
+//   let shakeThreshold = 20; // Adjust this value based on the intensity of the shake
 
 //   const handleLocationSharingClick = () => {
 //     navigate("/locationSharing");
@@ -306,14 +43,63 @@ export default function Home() {
 //     navigate("/helpline");
 //   };
 
+//   const sendLocationToTelegram = async () => {
+//     const mapsLink = `https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}`;
+//     const message = `📍 **Live Location Update!**\nLatitude: ${currentLocation.latitude}\nLongitude: ${currentLocation.longitude}\n[View on Maps](${mapsLink})`;
+
+//     const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+//     try {
+//       const response = await fetch(telegramApiUrl, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({
+//           chat_id: TELEGRAM_CHAT_ID,
+//           text: message,
+//           parse_mode: "Markdown",
+//         }),
+//       });
+
+//       if (response.ok) {
+//         console.log("Location sent to Telegram successfully!");
+//       } else {
+//         console.error("Failed to send location to Telegram");
+//       }
+//     } catch (error) {
+//       console.error("Error sending location to Telegram:", error);
+//     }
+//   };
+
+//   const sendVideoToTelegram = async (blob) => {
+//     const formData = new FormData();
+//     formData.append("chat_id", TELEGRAM_CHAT_ID);
+//     formData.append("video", blob, "video.webm");
+
+//     const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`;
+
+//     try {
+//       const response = await fetch(telegramApiUrl, {
+//         method: "POST",
+//         body: formData,
+//       });
+
+//       if (response.ok) {
+//         console.log("Video sent to Telegram successfully!");
+//       } else {
+//         console.error("Failed to send video to Telegram");
+//       }
+//     } catch (error) {
+//       console.error("Error sending video to Telegram:", error);
+//     }
+//   };
+
 //   const sendLocationToDiscord = async () => {
 //     const mapsLink = `https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}`;
 //     const message = {
-//       content: `📍 **Live Location Update!**\nLatitude: ${currentLocation.latitude}\nLongitude: ${currentLocation.longitude}\nView on Maps: [Click Here](${mapsLink})`,
+//       content: `📍 **Live Location Update!**\nLatitude: ${currentLocation.latitude}\nLongitude: ${currentLocation.longitude}\n[View on Maps](${mapsLink})`,
 //     };
-
-//     const DISCORD_WEBHOOK_URL =
-//       "https://discord.com/api/webhooks/1329138480764424294/ApXOIfyGBzZHmTwWjMJ5AVXh6C-VCOO6B51wenQq42J-S-mjjMMC8YhMnB0lpBE-U5WB";
 
 //     try {
 //       const response = await fetch(DISCORD_WEBHOOK_URL, {
@@ -325,12 +111,12 @@ export default function Home() {
 //       });
 
 //       if (response.ok) {
-//         console.log("Location shared successfully!");
+//         console.log("Location sent to Discord successfully!");
 //       } else {
-//         throw new Error("Failed to share location");
+//         console.error("Failed to send location to Discord");
 //       }
 //     } catch (error) {
-//       console.error("Error sharing location:", error);
+//       console.error("Error sending location to Discord:", error);
 //     }
 //   };
 
@@ -346,31 +132,14 @@ export default function Home() {
 //         const blob = new Blob(videoChunks, { type: "video/webm" });
 //         setVideoBlob(blob);
 //         videoChunks = [];
-//         const videoUrl = URL.createObjectURL(blob);
-//         // Send the video to Discord
-//         const formData = new FormData();
-//         formData.append("file", blob, "video.webm");
-
-//         const DISCORD_WEBHOOK_URL =
-//       "https://discord.com/api/webhooks/1329138480764424294/ApXOIfyGBzZHmTwWjMJ5AVXh6C-VCOO6B51wenQq42J-S-mjjMMC8YhMnB0lpBE-U5WB";
-
-//       const response = await fetch(DISCORD_WEBHOOK_URL, {
-//           method: "POST",
-//           body: formData,
-//         });
-
-//         if (response.ok) {
-//           console.log("Video sent to Discord successfully!");
-//         } else {
-//           console.log("Failed to send video to Discord.");
-//         }
+//         sendVideoToTelegram(blob); // Send video to Telegram
 //       };
 
 //       mediaRecorder.start();
 //       setIsRecording(true);
 
-//       // Record for 10 seconds and send the video to Discord
-//       recordingInterval = setInterval(() => {
+//       // Record for 10 seconds and send the video to Telegram
+//       videoSendInterval = setInterval(() => {
 //         if (mediaRecorder.state === "recording") {
 //           mediaRecorder.stop();
 //           mediaRecorder.start();
@@ -379,7 +148,7 @@ export default function Home() {
 
 //       // Share location every 10 seconds while recording
 //       locationInterval = setInterval(() => {
-//         sendLocationToDiscord();
+//         sendLocationToTelegram();
 //       }, 10000); // Share location every 10 seconds
 //     } catch (error) {
 //       console.error("Error starting recording:", error);
@@ -390,9 +159,10 @@ export default function Home() {
 //     if (mediaRecorder && mediaRecorder.state === "recording") {
 //       clearInterval(recordingInterval); // Stop the recording interval
 //       clearInterval(locationInterval); // Stop location sharing interval
+//       clearInterval(videoSendInterval); // Stop video sending interval
 //       mediaRecorder.stop();
 //       setIsRecording(false); // Set the button back to SOS
-//       mediaStream.getTracks().forEach(track => track.stop()); // Stop the camera stream
+//       mediaStream.getTracks().forEach((track) => track.stop()); // Stop the camera stream
 //     }
 //   };
 
@@ -403,11 +173,11 @@ export default function Home() {
 //     } else {
 //       // Start recording and start sharing location
 //       startRecording();
-//       await sendLocationToDiscord(); // Send initial location
+//       await sendLocationToTelegram(); // Send initial location to Telegram
+//       await sendLocationToDiscord(); // Send initial location to Discord
 //     }
 //   };
 
-//   // Get user's current location using geolocation
 //   const getCurrentLocation = () => {
 //     if (navigator.geolocation) {
 //       navigator.geolocation.getCurrentPosition(
@@ -426,6 +196,37 @@ export default function Home() {
 //       alert("Geolocation is not supported by this browser.");
 //     }
 //   };
+
+// // Power button detection simulation
+// const handlePowerButtonPress = () => {
+//   powerButtonPressCount += 1;
+//   if (powerButtonPressCount >= 3) {
+//     handleSOSButtonClick();
+//     powerButtonPressCount = 0; // Reset after triggering SOS
+//   }
+// };
+
+// // Detect shaking of the device
+// useEffect(() => {
+//   const handleShake = (event) => {
+//     const acceleration = event.accelerationIncludingGravity;
+//     const totalAcceleration = Math.sqrt(
+//       acceleration.x * acceleration.x +
+//         acceleration.y * acceleration.y +
+//         acceleration.z * acceleration.z
+//     );
+
+//     if (totalAcceleration > shakeThreshold) {
+//       handleSOSButtonClick();
+//     }
+//   };
+
+//   window.addEventListener("devicemotion", handleShake);
+
+//   return () => {
+//     window.removeEventListener("devicemotion", handleShake);
+//   };
+// }, []);
 
 //   useEffect(() => {
 //     getCurrentLocation(); // Get the user's current location when the component mounts
@@ -483,7 +284,9 @@ export default function Home() {
 
 //           <div className="flex justify-center items-center">
 //             <button
-//               className={`bg-red-600 text-white font-bold text-sm px-6 py-6 rounded-full shadow-lg hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-4 focus:ring-red-300 ${isRecording ? "bg-red-800" : ""}`}
+//               className={`bg-red-600 text-white font-bold text-sm px-6 py-6 rounded-full shadow-lg hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-4 focus:ring-red-300 ${
+//                 isRecording ? "bg-red-800" : ""
+//               }`}
 //               aria-label="SOS Button"
 //               onClick={handleSOSButtonClick}
 //             >
@@ -509,69 +312,50 @@ export default function Home() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// on clicking the sos button than only the video is sended
-
-
 // import { useState, useEffect, useRef } from "react";
 // import { MapPin, Phone } from "lucide-react";
 // import { useNavigate } from "react-router-dom";
 // import Map, { Marker, Popup } from "react-map-gl";
 // import "mapbox-gl/dist/mapbox-gl.css";
 // import SidebarWithNavbar from "./SidebarWithNavbar";
+// import AlertBell from "./IAlertBell";
+// import {
+//   MapPin as MapPinIcon, // Rename the icon import to avoid conflicts
+//   BellAlertIcon as BellIcon,
+//   ChatBubbleOvalLeftIcon as ChatIcon,
+//   PhoneIcon,
+// } from "@heroicons/react/24/outline";
 
-// const MAPBOX_TOKEN = "pk.eyJ1IjoidGVqYXMxOTM2IiwiYSI6ImNtNXk1b3p6aTBmN3oycW45anIxeGIyeGYifQ.g8zrtImUGHjJyyp0vn1fmA"; // Replace with your Mapbox token
+
+
+// const MAPBOX_TOKEN =
+//   "pk.eyJ1IjoidGVqYXMxOTM2IiwiYSI6ImNtNXk1b3p6aTBmN3oycW45anIxeGIyeGYifQ.g8zrtImUGHjJyyp0vn1fmA"; // Replace with your Mapbox token
+// const TELEGRAM_BOT_TOKEN =
+//   "7885100490:AAH_dz4DXJBQhZyQo2VfpoEfhjK5sMwLBEk"; // Your Telegram bot token
+// const TELEGRAM_CHAT_ID = "7329742224"; // Your Telegram chat ID
+// const DISCORD_WEBHOOK_URL =
+//   "https://discord.com/api/webhooks/1329138480764424294/ApXOIfyGBzZHmTwWjMJ5AVXh6C-VCOO6B51wenQq42J-S-mjjMMC8YhMnB0lpBE-U5WB"; // Your Discord webhook URL
 
 // export default function Home() {
 //   const [currentLocation, setCurrentLocation] = useState({
-//     latitude: 20.5937, // Default to India's center
-//     longitude: 78.9629,
+//     latitude: 19.0656, // Latitude of Angel Polytechnic College, Vashi
+//     longitude: 73.0169, // Longitude of Angel Polytechnic College, Vashi
 //   });
 //   const [locationReady, setLocationReady] = useState(false);
 //   const [isRecording, setIsRecording] = useState(false);
 //   const [videoBlob, setVideoBlob] = useState(null);
 //   const navigate = useNavigate();
+//   let mediaRecorder;
+//   let videoChunks = [];
+//   let recordingInterval;
+//   let locationInterval;
+//   let videoSendInterval;
+//   let mediaStream;
+//   let powerButtonPressCount = 0;
+//   let shakeThreshold = 20; // Adjust this value based on the intensity of the shake
 
-//   const mediaRecorderRef = useRef(null);
-//   const videoChunksRef = useRef([]);
-//   const mediaStreamRef = useRef(null);
-//   const locationIntervalRef = useRef(null);
+//   const lastClickTime = useRef(0); // Track the last click time
+//   const doubleClickThreshold = 300; // Time limit (in milliseconds) for double-clic
 
 //   const handleLocationSharingClick = () => {
 //     navigate("/locationSharing");
@@ -581,14 +365,63 @@ export default function Home() {
 //     navigate("/helpline");
 //   };
 
+//   const sendLocationToTelegram = async () => {
+//     const mapsLink = `https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}`;
+//     const message = `📍 **Live Location Update!**\nLatitude: ${currentLocation.latitude}\nLongitude: ${currentLocation.longitude}\n[View on Maps](${mapsLink})`;
+
+//     const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+//     try {
+//       const response = await fetch(telegramApiUrl, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({
+//           chat_id: TELEGRAM_CHAT_ID,
+//           text: message,
+//           parse_mode: "Markdown",
+//         }),
+//       });
+
+//       if (response.ok) {
+//         console.log("Location sent to Telegram successfully!");
+//       } else {
+//         console.error("Failed to send location to Telegram");
+//       }
+//     } catch (error) {
+//       console.error("Error sending location to Telegram:", error);
+//     }
+//   };
+
+//   const sendVideoToTelegram = async (blob) => {
+//     const formData = new FormData();
+//     formData.append("chat_id", TELEGRAM_CHAT_ID);
+//     formData.append("video", blob, "video.webm");
+
+//     const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`;
+
+//     try {
+//       const response = await fetch(telegramApiUrl, {
+//         method: "POST",
+//         body: formData,
+//       });
+
+//       if (response.ok) {
+//         console.log("Video sent to Telegram successfully!");
+//       } else {
+//         console.error("Failed to send video to Telegram");
+//       }
+//     } catch (error) {
+//       console.error("Error sending video to Telegram:", error);
+//     }
+//   };
+
 //   const sendLocationToDiscord = async () => {
 //     const mapsLink = `https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}`;
 //     const message = {
-//       content: `📍 **Live Location Update!**\nLatitude: ${currentLocation.latitude}\nLongitude: ${currentLocation.longitude}\nView on Maps: [Click Here](${mapsLink})`,
+//       content: `📍 **Live Location Update!**\nLatitude: ${currentLocation.latitude}\nLongitude: ${currentLocation.longitude}\n[View on Maps](${mapsLink})`,
 //     };
-
-//     const DISCORD_WEBHOOK_URL =
-//       "https://discord.com/api/webhooks/1329138480764424294/ApXOIfyGBzZHmTwWjMJ5AVXh6C-VCOO6B51wenQq42J-S-mjjMMC8YhMnB0lpBE-U5WB";
 
 //     try {
 //       const response = await fetch(DISCORD_WEBHOOK_URL, {
@@ -600,58 +433,44 @@ export default function Home() {
 //       });
 
 //       if (response.ok) {
-//         console.log("Location shared successfully!");
+//         console.log("Location sent to Discord successfully!");
 //       } else {
-//         throw new Error("Failed to share location");
+//         console.error("Failed to send location to Discord");
 //       }
 //     } catch (error) {
-//       console.error("Error sharing location:", error);
+//       console.error("Error sending location to Discord:", error);
 //     }
 //   };
 
 //   const startRecording = async () => {
 //     try {
-//       const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
-//       mediaStreamRef.current = mediaStream;
-//       const mediaRecorder = new MediaRecorder(mediaStream);
-
+//       mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+//       mediaRecorder = new MediaRecorder(mediaStream);
 //       mediaRecorder.ondataavailable = (event) => {
-//         videoChunksRef.current.push(event.data);
+//         videoChunks.push(event.data);
 //       };
 
 //       mediaRecorder.onstop = async () => {
-//         const blob = new Blob(videoChunksRef.current, { type: "video/webm" });
+//         const blob = new Blob(videoChunks, { type: "video/webm" });
 //         setVideoBlob(blob);
-//         videoChunksRef.current = [];
-
-//         const formData = new FormData();
-//         formData.append("file", blob, "video.webm");
-
-//         const DISCORD_WEBHOOK_URL =
-//           "https://discord.com/api/webhooks/1329138480764424294/ApXOIfyGBzZHmTwWjMJ5AVXh6C-VCOO6B51wenQq42J-S-mjjMMC8YhMnB0lpBE-U5WB";
-
-//         try {
-//           const response = await fetch(DISCORD_WEBHOOK_URL, {
-//             method: "POST",
-//             body: formData,
-//           });
-
-//           if (response.ok) {
-//             console.log("Video sent to Discord successfully!");
-//           } else {
-//             console.error("Failed to send video to Discord.");
-//           }
-//         } catch (error) {
-//           console.error("Error sending video:", error);
-//         }
+//         videoChunks = [];
+//         sendVideoToTelegram(blob); // Send video to Telegram
 //       };
 
 //       mediaRecorder.start();
-//       mediaRecorderRef.current = mediaRecorder;
 //       setIsRecording(true);
 
-//       locationIntervalRef.current = setInterval(() => {
-//         sendLocationToDiscord();
+//       // Record for 10 seconds and send the video to Telegram
+//       videoSendInterval = setInterval(() => {
+//         if (mediaRecorder.state === "recording") {
+//           mediaRecorder.stop();
+//           mediaRecorder.start();
+//         }
+//       }, 10000); // Stop and start recording every 10 seconds
+
+//       // Share location every 10 seconds while recording
+//       locationInterval = setInterval(() => {
+//         sendLocationToTelegram();
 //       }, 10000); // Share location every 10 seconds
 //     } catch (error) {
 //       console.error("Error starting recording:", error);
@@ -659,26 +478,57 @@ export default function Home() {
 //   };
 
 //   const stopRecording = () => {
-//     if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-//       mediaRecorderRef.current.stop();
-//       clearInterval(locationIntervalRef.current);
-//       locationIntervalRef.current = null;
-//       setIsRecording(false);
-
-//       if (mediaStreamRef.current) {
-//         mediaStreamRef.current.getTracks().forEach((track) => track.stop());
-//       }
+//     if (mediaRecorder && mediaRecorder.state === "recording") {
+//       clearInterval(recordingInterval); // Stop the recording interval
+//       clearInterval(locationInterval); // Stop location sharing interval
+//       clearInterval(videoSendInterval); // Stop video sending interval
+//       mediaRecorder.stop();
+//       setIsRecording(false); // Set the button back to SOS
+//       mediaStream.getTracks().forEach((track) => track.stop()); // Stop the camera stream
 //     }
 //   };
+
+//   // const handleSOSButtonClick = async () => {
+//   //   if (isRecording) {
+//   //     // Stop recording and stop location sharing
+//   //     stopRecording();
+//   //   } else {
+//   //     // Start recording and start sharing location
+//   //     startRecording();
+//   //     await sendLocationToTelegram(); // Send initial location to Telegram
+//   //     await sendLocationToDiscord(); // Send initial location to Discord
+//   //   }
+//   // };
 
 //   const handleSOSButtonClick = async () => {
-//     if (isRecording) {
-//       stopRecording();
-//     } else {
-//       await startRecording();
-//       sendLocationToDiscord(); // Send initial location immediately
+//     const currentTime = Date.now();
+//     const timeDifference = currentTime - lastClickTime.current;
+
+//     // Check if the time difference between clicks is small enough to be considered a double-click
+//     if (timeDifference < doubleClickThreshold) {
+//       console.log("Button double-clicked!");
+
+//       if (isRecording) {
+//         console.log("Stopping recording...");
+//         // Stop recording and stop location sharing
+//         stopRecording();
+//       } else {
+//         console.log("Starting recording...");
+//         // Start recording and start sharing location
+//         startRecording();
+//         await sendLocationToTelegram(); // Send initial location to Telegram
+//         await sendLocationToDiscord(); // Send initial location to Discord
+//       }
+
+//       // Toggle the isRecording state
+//       setIsRecording(!isRecording);
 //     }
+
+//     // Update lastClickTime to the current time
+//     lastClickTime.current = currentTime;
 //   };
+
+
 
 //   const getCurrentLocation = () => {
 //     if (navigator.geolocation) {
@@ -699,21 +549,332 @@ export default function Home() {
 //     }
 //   };
 
-//   useEffect(() => {
-//     getCurrentLocation();
+//   const handleAlertBellClick = () => {
+//     alert("Alert Bell triggered!");
+//     // Add custom functionality here (e.g., sound alarm, notify authorities, etc.)
+//   };
 
-//     return () => {
-//       if (locationIntervalRef.current) clearInterval(locationIntervalRef.current);
-//       if (mediaStreamRef.current) {
-//         mediaStreamRef.current.getTracks().forEach((track) => track.stop());
+//   // Power button detection simulation
+//   const handlePowerButtonPress = () => {
+//     powerButtonPressCount += 1;
+//     if (powerButtonPressCount >= 3) {
+//       handleSOSButtonClick();
+//       powerButtonPressCount = 0; // Reset after triggering SOS
+//     }
+//   };
+
+//   // Detect shaking of the device
+//   useEffect(() => {
+//     const handleShake = (event) => {
+//       const acceleration = event.accelerationIncludingGravity;
+//       const totalAcceleration = Math.sqrt(
+//         acceleration.x * acceleration.x +
+//         acceleration.y * acceleration.y +
+//         acceleration.z * acceleration.z
+//       );
+
+//       if (totalAcceleration > shakeThreshold) {
+//         handleSOSButtonClick();
 //       }
 //     };
+
+//     window.addEventListener("devicemotion", handleShake);
+
+//     return () => {
+//       window.removeEventListener("devicemotion", handleShake);
+//     };
+//   }, []);
+
+//   useEffect(() => {
+//     getCurrentLocation(); // Get the user's current location when the component mounts
+//   }, []);
+
+
+//   function HomeMain() {
+//     return (
+//       <div className="relative min-h-screen bg-gray-200">
+//         <SidebarWithNavbar />
+
+//         <div className="mt-16 px-4 md:px-8 flex-grow">
+//           <div className="w-full mb-4">
+//             <Map
+//               initialViewState={{
+//                 latitude: currentLocation.latitude,
+//                 longitude: currentLocation.longitude,
+//                 zoom: 13,
+//               }}
+//               style={{ width: "100%", height: "100vh" }}
+//               mapStyle="mapbox://styles/mapbox/streets-v11"
+//               mapboxAccessToken={MAPBOX_TOKEN}
+//             >
+//               {locationReady && (
+//                 <>
+//                   <Marker
+//                     latitude={currentLocation.latitude}
+//                     longitude={currentLocation.longitude}
+//                     anchor="bottom"
+//                   >
+//                     <MapPin className="text-red-500 w-6 h-6" />
+//                   </Marker>
+//                   <Popup
+//                     latitude={currentLocation.latitude}
+//                     longitude={currentLocation.longitude}
+//                     closeOnClick={false}
+//                     closeButton={true}
+//                     anchor="top"
+//                   >
+//                     <div>Your current location</div>
+//                   </Popup>
+//                 </>
+//               )}
+//             </Map>
+//           </div>
+
+//           {/* Bottom Fixed Section */}
+//           <div className="bg-white shadow-lg rounded-t-lg p-4 fixed bottom-0 left-0 right-0 z-50">
+//             <div className="flex justify-between items-center">
+//               {/* Share Location */}
+//               <div className="flex flex-col items-center">
+//                 <div
+//                   className="flex justify-center items-center bg-blue-600 text-white shadow-md rounded-full w-14 h-14 cursor-pointer"
+//                   onClick={handleLocationSharingClick}
+//                 >
+//                   <MapPinIcon className="w-6 h-6" />
+//                 </div>
+//                 <span className="text-xs text-gray-600 mt-2">Share Location</span>
+//               </div>
+
+//               {/* Alert Bell */}
+//               <div className="flex flex-col items-center">
+//                 <div
+//                   onClick={handleAlertBellClick}
+//                   className="flex justify-center items-center bg-blue-600 text-white shadow-md rounded-full w-14 h-14 cursor-pointer"
+//                 >
+//                   <BellIcon className="w-6 h-6" />
+//                 </div>
+//                 <span className="text-xs text-gray-600 mt-2">Alert</span>
+//               </div>
+
+//               {/* SOS Button */}
+//               <button
+//                 className={`bg-red-600 text-white font-bold text-sm px-6 py-6 rounded-full shadow-lg hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-4 focus:ring-red-300 ${
+//                   isRecording ? "bg-red-800" : ""
+//                 }`}
+//                 aria-label="SOS Button"
+//                 onClick={handleSOSButtonClick}
+//               >
+//                 {isRecording ? "Stop Recording" : "SOS"}
+//               </button>
+
+//               {/* Chatbot */}
+//               <div className="flex flex-col items-center">
+//                 <div className="flex justify-center items-center bg-blue-600 text-white shadow-md rounded-full w-14 h-14 cursor-pointer">
+//                   <ChatIcon className="w-6 h-6" />
+//                 </div>
+//                 <span className="text-xs text-gray-600 mt-2">Chatbot</span>
+//               </div>
+
+//               {/* Helpline */}
+//               <div className="flex flex-col items-center">
+//                 <div
+//                   onClick={handleHelplineButtonClick}
+//                   className="flex justify-center items-center bg-blue-600 text-white shadow-md rounded-full w-14 h-14 cursor-pointer"
+//                 >
+//                   <PhoneIcon className="w-6 h-6" />
+//                 </div>
+//                 <span className="text-xs text-gray-600 mt-2">Helpline</span>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+
+// import { useState, useEffect, useRef } from "react";
+// import { MapPin, Phone } from "lucide-react";
+// import { useNavigate } from "react-router-dom";
+// import Map, { Marker, Popup } from "react-map-gl";
+// import "mapbox-gl/dist/mapbox-gl.css";
+// import SidebarWithNavbar from "./SidebarWithNavbar";
+
+// const MAPBOX_TOKEN =
+//   "pk.eyJ1IjoidGVqYXMxOTM2IiwiYSI6ImNtNXk1b3p6aTBmN3oycW45anIxeGIyeGYifQ.g8zrtImUGHjJyyp0vn1fmA"; // Replace with your Mapbox token
+// const TELEGRAM_BOT_TOKEN =
+//   "YOUR_TELEGRAM_BOT_TOKEN"; // Replace with your Telegram bot token
+// const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID"; // Replace with your Telegram chat ID
+// const DISCORD_WEBHOOK_URL =
+//   "YOUR_DISCORD_WEBHOOK_URL"; // Replace with your Discord webhook URL
+
+//   export default function Home() {
+//     const [currentLocation, setCurrentLocation] = useState({
+//       latitude: 19.0656, // Latitude of Angel Polytechnic College, Vashi
+//       longitude: 73.0169, // Longitude of Angel Polytechnic College, Vashi
+//     });
+//   const [locationReady, setLocationReady] = useState(false);
+//   const [isRecording, setIsRecording] = useState(false);
+//   const [videoBlob, setVideoBlob] = useState(null);
+//   const navigate = useNavigate();
+
+//   let mediaRecorder = null;
+//   let videoChunks = [];
+//   let mediaStream = null;
+
+//   const handleLocationSharingClick = () => {
+//     navigate("/locationSharing");
+//   };
+
+//   const handleHelplineButtonClick = () => {
+//     navigate("/helpline");
+//   };
+
+//   const sendLocationToTelegram = async () => {
+//     const mapsLink = `https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}`;
+//     const message = `📍 **Live Location Update!**\nLatitude: ${currentLocation.latitude}\nLongitude: ${currentLocation.longitude}\n[View on Maps](${mapsLink})`;
+
+//     const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+//     try {
+//       const response = await fetch(telegramApiUrl, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({
+//           chat_id: TELEGRAM_CHAT_ID,
+//           text: message,
+//           parse_mode: "Markdown",
+//         }),
+//       });
+
+//       if (response.ok) {
+//         console.log("Location sent to Telegram successfully!");
+//       } else {
+//         console.error("Failed to send location to Telegram");
+//       }
+//     } catch (error) {
+//       console.error("Error sending location to Telegram:", error);
+//     }
+//   };
+
+//   const sendVideoToTelegram = async (blob) => {
+//     const formData = new FormData();
+//     formData.append("chat_id", TELEGRAM_CHAT_ID);
+//     formData.append("video", blob, "video.webm");
+
+//     const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`;
+
+//     try {
+//       const response = await fetch(telegramApiUrl, {
+//         method: "POST",
+//         body: formData,
+//       });
+
+//       if (response.ok) {
+//         console.log("Video sent to Telegram successfully!");
+//       } else {
+//         console.error("Failed to send video to Telegram");
+//       }
+//     } catch (error) {
+//       console.error("Error sending video to Telegram:", error);
+//     }
+//   };
+
+//   const startRecording = async () => {
+//     try {
+//       mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+//       console.log("Camera access granted!");
+
+//       mediaRecorder = new MediaRecorder(mediaStream);
+//       videoChunks = [];
+
+//       mediaRecorder.ondataavailable = (event) => {
+//         if (event.data.size > 0) {
+//           videoChunks.push(event.data);
+//         }
+//       };
+
+//       mediaRecorder.onstop = async () => {
+//         const blob = new Blob(videoChunks, { type: "video/webm" });
+//         setVideoBlob(blob);
+//         await sendVideoToTelegram(blob);
+//       };
+
+//       mediaRecorder.start();
+//       setIsRecording(true);
+//       console.log("Recording started!");
+//     } catch (error) {
+//       console.error("Error starting recording:", error.message);
+//     }
+//   };
+
+//   const stopRecording = () => {
+//     if (mediaRecorder && mediaRecorder.state === "recording") {
+//       mediaRecorder.stop();
+//       setIsRecording(false);
+//       console.log("Recording stopped.");
+//       mediaStream.getTracks().forEach((track) => track.stop());
+//     }
+//   };
+
+//   const lastClickTime = useRef(0); // Track the last click time
+//   const doubleClickThreshold = 300; // Time limit (in milliseconds) for double-click detection
+
+//   const handleClick = async () => {
+//     const currentTime = Date.now();
+//     const timeDifference = currentTime - lastClickTime.current;
+
+//     // Check if the time difference between clicks is small enough to be considered a double-click
+//     if (timeDifference < doubleClickThreshold) {
+//       console.log("Button double-clicked!");
+
+//       if (isRecording) {
+//         console.log("Stopping recording...");
+//         // Stop recording and stop location sharing
+//         stopRecording();
+//       } else {
+//         console.log("Starting recording...");
+//         // Start recording and start sharing location
+//         startRecording();
+//         await sendLocationToTelegram(); // Send initial location to Telegram
+//         await sendLocationToDiscord(); // Send initial location to Discord
+//       }
+
+//       // Toggle the isRecording state
+//       setIsRecording(!isRecording);
+//     }
+
+//     // Update lastClickTime to the current time
+//     lastClickTime.current = currentTime;
+//   };
+
+//   const getCurrentLocation = () => {
+//     if (navigator.geolocation) {
+//       navigator.geolocation.getCurrentPosition(
+//         (position) => {
+//           setCurrentLocation({
+//             latitude: position.coords.latitude,
+//             longitude: position.coords.longitude,
+//           });
+//           setLocationReady(true);
+//         },
+//         (error) => {
+//           console.error("Error getting location: ", error.message);
+//         }
+//       );
+//     } else {
+//       alert("Geolocation is not supported by this browser.");
+//     }
+//   };
+
+//   useEffect(() => {
+//     getCurrentLocation();
 //   }, []);
 
 //   return (
 //     <div className="relative min-h-screen bg-gray-200">
 //       <SidebarWithNavbar />
-
 //       <div className="mt-16 px-4 md:px-8 flex-grow">
 //         <div className="w-full mb-4">
 //           <Map
@@ -748,39 +909,604 @@ export default function Home() {
 //             )}
 //           </Map>
 //         </div>
-
-//         <div className="w-full flex justify-between items-center p-4 bg-transparent fixed bottom-0 left-0 md:left-1/2 transform md:-translate-x-1/2 z-50">
-//           <div className="flex flex-col items-center">
+//         <div className="bg-white shadow-lg rounded-t-lg p-4 fixed bottom-0 left-0 right-0 z-50">
+//           <div className="flex justify-between items-center">
 //             <div
-//               className="flex justify-center items-center bg-white shadow-md rounded-full w-14 h-14 cursor-pointer"
+//               className="bg-blue-600 text-white p-4 rounded-full cursor-pointer"
 //               onClick={handleLocationSharingClick}
 //             >
-//               <MapPin className="w-6 h-6 text-gray-700" />
+//               <MapPin />
 //             </div>
-//             <span className="text-xs text-gray-600 mt-2">Share Location</span>
-//           </div>
-
-//           <div className="flex justify-center items-center">
 //             <button
-//               className={`bg-red-600 text-white font-bold text-sm px-6 py-6 rounded-full shadow-lg hover:bg-red-600 transition duration-300 focus:outline-none focus:ring-4 focus:ring-red-300 ${isRecording ? "bg-red-800" : ""}`}
-//               aria-label="SOS Button"
 //               onClick={handleSOSButtonClick}
+//               className={`bg-red-600 text-white px-6 py-3 rounded-full ${
+//                 isRecording ? "bg-red-800" : ""
+//               }`}
 //             >
 //               {isRecording ? "Stop Recording" : "SOS"}
 //             </button>
-//           </div>
-
-//           <div className="flex flex-col items-center">
 //             <div
+//               className="bg-blue-600 text-white p-4 rounded-full cursor-pointer"
 //               onClick={handleHelplineButtonClick}
-//               className="flex justify-center items-center bg-white shadow-md rounded-full w-14 h-14 cursor-pointer"
 //             >
-//               <Phone className="w-6 h-6 text-gray-700" />
+//               <Phone />
 //             </div>
-//             <span className="text-xs text-gray-600 mt-2">Helpline</span>
 //           </div>
 //         </div>
 //       </div>
 //     </div>
 //   );
 // }
+
+
+
+// import { useState, useEffect, useRef } from "react";
+// import { MapPin, Phone } from "lucide-react";
+// import { useNavigate } from "react-router-dom";
+// import Map, { Marker, Popup } from "react-map-gl";
+// import "mapbox-gl/dist/mapbox-gl.css";
+// import SidebarWithNavbar from "./SidebarWithNavbar";
+
+// const MAPBOX_TOKEN =
+//   "pk.eyJ1IjoidGVqYXMxOTM2IiwiYSI6ImNtNXk1b3p6aTBmN3oycW45anIxeGIyeGYifQ.g8zrtImUGHjJyyp0vn1fmA"; // Replace with your Mapbox token
+// const TELEGRAM_BOT_TOKEN =
+//   "YOUR_TELEGRAM_BOT_TOKEN"; // Replace with your Telegram bot token
+// const TELEGRAM_CHAT_ID = "YOUR_CHAT_ID"; // Replace with your Telegram chat ID
+// const DISCORD_WEBHOOK_URL =
+//   "YOUR_DISCORD_WEBHOOK_URL"; // Replace with your Discord webhook URL
+
+// export default function Home() {
+
+//   const lastClickTime = useRef(0); // Track the last click time
+//   const doubleClickThreshold = 300; // Time limit (in milliseconds) for double-click detection
+
+//   const handleSOSButtonClick = async () => {
+//     const currentTime = Date.now();
+//     const timeDifference = currentTime - lastClickTime.current;
+
+//     // Check if the time difference between clicks is small enough to be considered a double-click
+//     if (timeDifference < doubleClickThreshold) {
+//       console.log("Button double-clicked!");
+
+//       if (isRecording) {
+//         console.log("Stopping recording...");
+//         // Stop recording and stop location sharing
+//         stopRecording();
+//       } else {
+//         console.log("Starting recording...");
+//         // Start recording and start sharing location
+//         startRecording();
+//         await sendLocationToTelegram(); // Send initial location to Telegram
+//         await sendLocationToDiscord(); // Send initial location to Discord
+//       }
+
+//       // Toggle the isRecording state
+//       setIsRecording(!isRecording);
+//     }
+
+//     // Update lastClickTime to the current time
+//     lastClickTime.current = currentTime;
+//   };
+
+//   const [currentLocation, setCurrentLocation] = useState({
+//     latitude: 20.5937, // Default to India's center
+//     longitude: 78.9629,
+//   });
+//   const [locationReady, setLocationReady] = useState(false);
+//   const [isRecording, setIsRecording] = useState(false);
+//   const [videoBlob, setVideoBlob] = useState(null);
+//   const navigate = useNavigate();
+
+//   let mediaRecorder = null;
+//   let videoChunks = [];
+//   let mediaStream = null;
+
+//   const handleLocationSharingClick = () => {
+//     navigate("/locationSharing");
+//   };
+
+//   const handleHelplineButtonClick = () => {
+//     navigate("/helpline");
+//   };
+
+//   const sendLocationToTelegram = async () => {
+//     const mapsLink = `https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}`;
+//     const message = `📍 **Live Location Update!**\nLatitude: ${currentLocation.latitude}\nLongitude: ${currentLocation.longitude}\n[View on Maps](${mapsLink})`;
+
+//     const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+//     try {
+//       const response = await fetch(telegramApiUrl, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({
+//           chat_id: TELEGRAM_CHAT_ID,
+//           text: message,
+//           parse_mode: "Markdown",
+//         }),
+//       });
+
+//       if (response.ok) {
+//         console.log("Location sent to Telegram successfully!");
+//       } else {
+//         console.error("Failed to send location to Telegram");
+//       }
+//     } catch (error) {
+//       console.error("Error sending location to Telegram:", error);
+//     }
+//   };
+
+//   const sendVideoToTelegram = async (blob) => {
+//     const formData = new FormData();
+//     formData.append("chat_id", TELEGRAM_CHAT_ID);
+//     formData.append("video", blob, "video.webm");
+
+//     const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`;
+
+//     try {
+//       const response = await fetch(telegramApiUrl, {
+//         method: "POST",
+//         body: formData,
+//       });
+
+//       if (response.ok) {
+//         console.log("Video sent to Telegram successfully!");
+//       } else {
+//         console.error("Failed to send video to Telegram");
+//       }
+//     } catch (error) {
+//       console.error("Error sending video to Telegram:", error);
+//     }
+//   };
+
+//   const startRecording = async () => {
+//     try {
+//       mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+//       console.log("Camera access granted!");
+
+//       mediaRecorder = new MediaRecorder(mediaStream);
+//       videoChunks = [];
+
+//       mediaRecorder.ondataavailable = (event) => {
+//         if (event.data.size > 0) {
+//           videoChunks.push(event.data);
+//         }
+//       };
+
+//       mediaRecorder.onstop = async () => {
+//         const blob = new Blob(videoChunks, { type: "video/webm" });
+//         setVideoBlob(blob);
+//         await sendVideoToTelegram(blob);
+//       };
+
+//       mediaRecorder.start();
+//       setIsRecording(true);
+//       console.log("Recording started!");
+//     } catch (error) {
+//       console.error("Error starting recording:", error.message);
+//     }
+//   };
+
+//   const stopRecording = () => {
+//     if (mediaRecorder && mediaRecorder.state === "recording") {
+//       mediaRecorder.stop();
+//       setIsRecording(false);
+//       console.log("Recording stopped.");
+//       mediaStream.getTracks().forEach((track) => track.stop());
+//     }
+//   };
+
+//   // const handleSOSButtonClick = async () => {
+//   //   if (isRecording) {
+//   //     stopRecording();
+//   //   } else {
+//   //     startRecording();
+//   //     await sendLocationToTelegram();
+//   //   }
+//   // };
+
+
+//   const getCurrentLocation = () => {
+//     if (navigator.geolocation) {
+//       navigator.geolocation.getCurrentPosition(
+//         (position) => {
+//           setCurrentLocation({
+//             latitude: position.coords.latitude,
+//             longitude: position.coords.longitude,
+//           });
+//           setLocationReady(true);
+//         },
+//         (error) => {
+//           console.error("Error getting location: ", error.message);
+//         }
+//       );
+//     } else {
+//       alert("Geolocation is not supported by this browser.");
+//     }
+//   };
+
+//   useEffect(() => {
+//     getCurrentLocation();
+//   }, []);
+
+//   return (
+//     <div className="relative min-h-screen bg-gray-200">
+//       <SidebarWithNavbar />
+//       <div className="mt-16 px-4 md:px-8 flex-grow">
+//         <div className="w-full mb-4">
+//           <Map
+//             initialViewState={{
+//               latitude: currentLocation.latitude,
+//               longitude: currentLocation.longitude,
+//               zoom: 13,
+//             }}
+//             style={{ width: "100%", height: "60vh" }}
+//             mapStyle="mapbox://styles/mapbox/streets-v11"
+//             mapboxAccessToken={MAPBOX_TOKEN}
+//           >
+//             {locationReady && (
+//               <>
+//                 <Marker
+//                   latitude={currentLocation.latitude}
+//                   longitude={currentLocation.longitude}
+//                   anchor="bottom"
+//                 >
+//                   <MapPin className="text-red-500 w-6 h-6" />
+//                 </Marker>
+//                 <Popup
+//                   latitude={currentLocation.latitude}
+//                   longitude={currentLocation.longitude}
+//                   closeOnClick={false}
+//                   closeButton={true}
+//                   anchor="top"
+//                 >
+//                   <div>Your current location</div>
+//                 </Popup>
+//               </>
+//             )}
+//           </Map>
+//         </div>
+//         <div className="bg-white shadow-lg rounded-t-lg p-4 fixed bottom-0 left-0 right-0 z-50">
+//           <div className="flex justify-between items-center">
+//             <div
+//               className="bg-blue-600 text-white p-4 rounded-full cursor-pointer"
+//               onClick={handleLocationSharingClick}
+//             >
+//               <MapPin />
+//             </div>
+//             <button
+//               onClick={handleSOSButtonClick}
+//               className={`bg-red-600 text-white px-6 py-3 rounded-full ${
+//                 isRecording ? "bg-red-800" : ""
+//               }`}
+//             >
+//               {isRecording ? "Stop Recording" : "SOS"}
+//             </button>
+//             <div
+//               className="bg-blue-600 text-white p-4 rounded-full cursor-pointer"
+//               onClick={handleHelplineButtonClick}
+//             >
+//               <Phone />
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+import { useState, useEffect, useRef } from "react";
+import { MapPin, Phone } from "lucide-react";
+import Map, { Marker, Popup } from "react-map-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import { useNavigate } from "react-router-dom";
+import SidebarWithNavbar from "./SidebarWithNavbar"
+import TidioChat from "../components/TidioChat";
+
+const MAPBOX_TOKEN =
+  "pk.eyJ1IjoidGVqYXMxOTM2IiwiYSI6ImNtNXk1b3p6aTBmN3oycW45anIxeGIyeGYifQ.g8zrtImUGHjJyyp0vn1fmA"; // Replace with your Mapbox token
+const TELEGRAM_BOT_TOKEN =
+  "7885100490:AAH_dz4DXJBQhZyQo2VfpoEfhjK5sMwLBEk"; // Your Telegram bot token
+const TELEGRAM_CHAT_ID = "7329742224"; // Your Telegram chat ID
+const DISCORD_WEBHOOK_URL =
+  "https://discord.com/api/webhooks/1329138480764424294/ApXOIfyGBzZHmTwWjMJ5AVXh6C-VCOO6B51wenQq42J-S-mjjMMC8YhMnB0lpBE-U5WB"; // Your Discord webhook URL
+export default function Home() {
+  const lastClickTime = useRef(0); // Track the last click time
+  const doubleClickThreshold = 300; // Time limit (in milliseconds) for double-click detection
+  let shakeThreshold = 20; // Adjust this value based on the intensity of the shake
+
+  const [currentLocation, setCurrentLocation] = useState({
+    latitude: 20.5937, // Default to India's center
+    longitude: 78.9629,
+  });
+  const [locationReady, setLocationReady] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [videoBlob, setVideoBlob] = useState(null);
+  const navigate = useNavigate();
+
+  let mediaRecorder = null;
+  let videoChunks = [];
+  let mediaStream = null;
+
+  const handleLocationSharingClick = () => {
+    navigate("/locationSharing");
+  };
+
+  const handleHelplineButtonClick = () => {
+    navigate("/helpline");
+  };
+
+  const sendLocationToTelegram = async () => {
+    const mapsLink = `https://www.google.com/maps?q=${currentLocation.latitude},${currentLocation.longitude}`;
+    const message = `📍 **Live Location Update!**\nLatitude: ${currentLocation.latitude}\nLongitude: ${currentLocation.longitude}\n[View on Maps](${mapsLink})`;
+
+    const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
+    try {
+      const response = await fetch(telegramApiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: message,
+          parse_mode: "Markdown",
+        }),
+      });
+
+      if (response.ok) {
+        console.log("Location sent to Telegram successfully!");
+      } else {
+        console.error("Failed to send location to Telegram");
+      }
+    } catch (error) {
+      console.error("Error sending location to Telegram:", error);
+    }
+  };
+
+  const sendVideoToTelegram = async (blob) => {
+    const formData = new FormData();
+    formData.append("chat_id", TELEGRAM_CHAT_ID);
+    formData.append("video", blob, "video.webm");
+
+    const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendVideo`;
+
+    try {
+      const response = await fetch(telegramApiUrl, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        console.log("Video sent to Telegram successfully!");
+      } else {
+        console.error("Failed to send video to Telegram");
+      }
+    } catch (error) {
+      console.error("Error sending video to Telegram:", error);
+    }
+  };
+
+  // const startRecording = async () => {
+  //   try {
+  //     mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+  //     console.log("Camera access granted!");
+
+  //     mediaRecorder = new MediaRecorder(mediaStream);
+  //     videoChunks = [];
+
+  //     mediaRecorder.ondataavailable = (event) => {
+  //       if (event.data.size > 0) {
+  //         videoChunks.push(event.data);
+  //       }
+  //     };
+
+  //     mediaRecorder.onstop = async () => {
+  //       const blob = new Blob(videoChunks, { type: "video/webm" });
+  //       setVideoBlob(blob);
+  //       await sendVideoToTelegram(blob);
+  //     };
+
+  //     mediaRecorder.start();
+  //     setIsRecording(true);
+  //     console.log("Recording started!");
+  //   } catch (error) {
+  //     console.error("Error starting recording:", error.message);
+  //   }
+  // };
+
+  // const stopRecording = () => {
+  //   if (mediaRecorder && mediaRecorder.state === "recording") {
+  //     mediaRecorder.stop();
+  //     setIsRecording(false);
+  //     console.log("Recording stopped.");
+  //     mediaStream.getTracks().forEach((track) => track.stop());
+  //   }
+  // };
+  const startRecording = async () => {
+    try {
+      mediaStream = await navigator.mediaDevices.getUserMedia({ video: true });
+      mediaRecorder = new MediaRecorder(mediaStream);
+      mediaRecorder.ondataavailable = (event) => {
+        videoChunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = async () => {
+        const blob = new Blob(videoChunks, { type: "video/webm" });
+        setVideoBlob(blob);
+        videoChunks = [];
+        sendVideoToTelegram(blob); // Send video to Telegram
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+
+      // Record for 10 seconds and send the video to Telegram
+      videoSendInterval = setInterval(() => {
+        if (mediaRecorder.state === "recording") {
+          mediaRecorder.stop();
+          mediaRecorder.start();
+        }
+      }, 10000); // Stop and start recording every 10 seconds
+
+      // Share location every 10 seconds while recording
+      locationInterval = setInterval(() => {
+        sendLocationToTelegram();
+      }, 10000); // Share location every 10 seconds
+    } catch (error) {
+      console.error("Error starting recording:", error);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state === "recording") {
+      clearInterval(recordingInterval); // Stop the recording interval
+      clearInterval(locationInterval); // Stop location sharing interval
+      clearInterval(videoSendInterval); // Stop video sending interval
+      mediaRecorder.stop();
+      setIsRecording(false); // Set the button back to SOS
+      mediaStream.getTracks().forEach((track) => track.stop()); // Stop the camera stream
+    }
+  };
+
+  const handleSOSButtonClick = async () => {
+    const currentTime = Date.now();
+    const timeDifference = currentTime - lastClickTime.current;
+
+    if (timeDifference < doubleClickThreshold) {
+      console.log("Button double-clicked!");
+
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+        await sendLocationToTelegram();
+      }
+
+      setIsRecording(!isRecording);
+    }
+
+    lastClickTime.current = currentTime;
+  };
+
+  // Power button detection simulation
+  const handlePowerButtonPress = () => {
+    powerButtonPressCount += 1;
+    if (powerButtonPressCount >= 3) {
+      handleSOSButtonClick();
+      powerButtonPressCount = 0; // Reset after triggering SOS
+    }
+  };
+
+  // Detect shaking of the device
+  useEffect(() => {
+    const handleShake = (event) => {
+      const acceleration = event.accelerationIncludingGravity;
+      const totalAcceleration = Math.sqrt(
+        acceleration.x * acceleration.x +
+        acceleration.y * acceleration.y +
+        acceleration.z * acceleration.z
+      );
+
+      if (totalAcceleration > shakeThreshold) {
+        handleSOSButtonClick();
+      }
+    };
+
+    window.addEventListener("devicemotion", handleShake);
+
+    return () => {
+      window.removeEventListener("devicemotion", handleShake);
+    };
+  }, []);
+
+  const getCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCurrentLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          setLocationReady(true);
+        },
+        (error) => {
+          console.error("Error getting location:", error.message);
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
+  useEffect(() => {
+    getCurrentLocation();
+  }, []);
+
+  return (
+    <div className="relative min-h-screen bg-gray-200">
+      <SidebarWithNavbar />
+      <div className="mt-16 px-4 md:px-8 flex-grow">
+        <div className="w-full mb-4">
+          <Map
+            initialViewState={{
+              latitude: currentLocation.latitude,
+              longitude: currentLocation.longitude,
+              zoom: 13,
+            }}
+            style={{ width: "100%", height: "100vh" }}
+            mapStyle="mapbox://styles/mapbox/streets-v11"
+            mapboxAccessToken={MAPBOX_TOKEN}
+          >
+            {locationReady && (
+              <>
+                <Marker
+                  latitude={currentLocation.latitude}
+                  longitude={currentLocation.longitude}
+                  anchor="bottom"
+                >
+                  <MapPin className="text-red-500 w-6 h-6" />
+                </Marker>
+                <Popup
+                  latitude={currentLocation.latitude}
+                  longitude={currentLocation.longitude}
+                  closeOnClick={false}
+                  closeButton={true}
+                  anchor="top"
+                >
+                  <div>Your current location</div>
+                </Popup>
+              </>
+            )}
+          </Map>
+        </div>
+        <div className="bg-white shadow-lg rounded-t-lg p-4 fixed bottom-0 left-0 right-0 z-50">
+          <div className="flex justify-between items-center">
+            <div
+              className="bg-blue-600 text-white p-4 rounded-full cursor-pointer"
+              onClick={handleLocationSharingClick}
+            >
+              <MapPin />
+            </div>
+            <button
+              onClick={handleSOSButtonClick}
+              className={`bg-red-600 text-white px-6 py-3 rounded-full ${isRecording ? "bg-red-800" : ""
+                }`}
+            >
+              {isRecording ? "Stop Recording" : "SOS"}
+            </button>
+            <div
+              className="bg-blue-600 text-white p-4 rounded-full cursor-pointer"
+              onClick={handleHelplineButtonClick}
+            >
+              <Phone />
+            </div>
+          </div>
+        </div>
+        <TidioChat />
+      </div>
+    </div>
+  );
+}

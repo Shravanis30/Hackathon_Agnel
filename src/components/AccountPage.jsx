@@ -1,354 +1,16 @@
-// import React from "react";
-// import { useNavigate } from "react-router-dom";
-
-// function AccountPage() {
-//   const navigate = useNavigate();
-
-//   return (
-//     <div className="flex flex-col items-center justify-center h-screen bg-blue-600 text-white">
-//       {/* Logo Section */}
-//       <div className="flex items-center justify-center mb-6">
-//         <img
-//           src="/path-to-logo.png"
-//           alt="SafeGuardHer"
-//           className="w-20 h-20"
-//         />
-//       </div>
-
-//       {/* Title Section */}
-//       <h1 className="text-3xl font-bold mb-6">SafeGuardHer</h1>
-
-//       {/* Illustration */}
-//       <div className="mb-6">
-//         <img
-//           src="/path-to-illustration.png" // Replace with the path to your image
-//           alt="Illustration"
-//           className="w-60 h-60"
-//         />
-//       </div>
-
-//       {/* Buttons */}
-//       <button
-//         onClick={() => navigate("/login")}
-//         className="bg-pink-500 px-8 py-3 rounded-full mb-4 text-white font-semibold shadow-md hover:bg-pink-600"
-//       >
-//         Login
-//       </button>
-//       <button
-//         onClick={() => navigate("/signup")}
-//         className="bg-blue-800 px-8 py-3 rounded-full text-white font-semibold shadow-md hover:bg-blue-700"
-//       >
-//         Continue using Google
-//       </button>
-
-//       {/* Footer Section */}
-//       <p className="mt-6">
-//         Don't have an account?{" "}
-//         <span
-//           onClick={() => navigate("/signup")}
-//           className="text-pink-500 cursor-pointer underline"
-//         >
-//           Sign up here
-//         </span>
-//       </p>
-//     </div>
-//   );
-// }
-
-// export default AccountPage;
-
-
-
-
-// import React from "react";
-// import { useNavigate } from "react-router-dom";
-// import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-// import { app } from "../firebase";
-
-// const auth = getAuth(app)
-// const googleProvider = new GoogleAuthProvider()
-
-// const signupWithGoogle = () => {
-//   signInWithPopup(auth, googleProvider)
-// }
-
-// function AccountPage() {
-//   const navigate = useNavigate();
-
-//   return (
-//     <div className="flex flex-col items-center justify-center h-screen bg-blue-600 text-white">
-//       {/* Logo Section */}
-//       <div className="flex items-center justify-center mb-6">
-//         <img
-//           src="/path-to-logo.png"
-//           alt="SafeGuardHer"
-//           className="w-20 h-20"
-//         />
-//       </div>
-
-//       {/* Title Section */}
-//       <h1 className="text-3xl font-bold mb-6">SafeGuardHer</h1>
-
-//       {/* Illustration */}
-//       <div className="mb-6">
-//         <img
-//           src="/path-to-illustration.png" // Replace with the path to your image
-//           alt="Illustration"
-//           className="w-60 h-60"
-//         />
-//       </div>
-
-//       {/* Buttons */}
-//       <button
-//         onClick={() => navigate("/login")}
-//         className="bg-pink-500 px-8 py-3 rounded-full mb-4 text-white font-semibold shadow-md hover:bg-pink-600"
-//       >
-//         Login
-//       </button>
-//       <button
-//       onClick={signupWithGoogle}
-//         className="bg-blue-800 px-8 py-3 rounded-full text-white font-semibold shadow-md hover:bg-blue-700"
-//       >
-//         Continue using Google
-//       </button>
-
-//       {/* Footer Section */}
-//       <p className="mt-6">
-//         Don't have an account?{" "}
-//         <span
-//           onClick={() => navigate("/signup")}
-//           className="text-pink-500 cursor-pointer underline"
-//         >
-//           Sign up here
-//         </span>
-//       </p>
-//     </div>
-//   );
-// }
-
-// export default AccountPage;
-
-
-
-
-
-// import React from "react";
-// import { useNavigate } from "react-router-dom";
-// import {app} from "../firebase"
-// import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from "firebase/auth";
-
-// const auth = getAuth(app)
-// const googleProvider = new GoogleAuthProvider();
-
-// function AccountPage() {
-//   const navigate = useNavigate();
-
-// const signupWithGoogle = () => {
-//   // signInWithPopup(auth, googleProvider)
-//   signInWithRedirect(auth, googleProvider)
-// }
-
-//   return (
-//     <div className="flex flex-col items-center justify-center h-screen bg-blue-600 text-white">
-//       {/* Logo Section */}
-//       <div className="flex items-center justify-center mb-6">
-//         <img
-//           src="/path-to-logo.png"
-//           alt="SafeGuardHer"
-//           className="w-20 h-20"
-//         />
-//       </div>
-
-//       {/* Title Section */}
-//       <h1 className="text-3xl font-bold mb-6">SafeGuardHer</h1>
-
-//       {/* Illustration */}
-//       <div className="mb-6">
-//         <img
-//           src="/path-to-illustration.png" // Replace with the path to your image
-//           alt="Illustration"
-//           className="w-60 h-60"
-//         />
-//       </div>
-
-//       {/* Buttons */}
-//       <button
-//         onClick={() => navigate("/loginPage")}
-//         className="bg-pink-500 px-8 py-3 rounded-full mb-4 text-white font-semibold shadow-md hover:bg-pink-600"
-//       >
-//         Login
-//       </button>
-//       <button
-//       onClick={signupWithGoogle}
-//         className="bg-blue-800 px-8 py-3 rounded-full text-white font-semibold shadow-md hover:bg-blue-700"
-//       >
-//         Continue using Google
-//       </button>
-
-//       {/* Footer Section */}
-//       <p className="mt-6">
-//         Don't have an account?{" "}
-//         <span
-//           onClick={() => navigate("/signUp")}
-//           className="text-pink-500 cursor-pointer underline"
-//         >
-//           Sign up here
-//         </span>
-//       </p>
-//     </div>
-//   );
-// }
-
-// export default AccountPage;
-
-
-// // import React from "react";
-// import { useNavigate } from "react-router-dom";
-// // import { app } from "../firebase";
-// // import { getAuth, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
-
-// import { getAuth, GoogleAuthProvider, getRedirectResult, signInWithRedirect } from "firebase/auth";
-
-//   const auth = getAuth();
-//   const googleProvider = new GoogleAuthProvider();
-// // const auth = getAuth(app);
-// // const googleProvider = new GoogleAuthProvider();
-
-// function AccountPage() {
-//   const navigate = useNavigate();
-
-  
-  
-//   const signupWithGoogle = () => {
-//     signInWithRedirect(auth, googleProvider);
-//   };
-  
-//   // Handle the redirect result
-//   getRedirectResult(auth)
-//     .then((result) => {
-//       if (result) {
-//         console.log("User signed in:", result.user);
-//       }
-//     })
-//     .catch((error) => {
-//       console.error("Error handling redirect result:", error);
-//     });
-
-//   return (
-//     <div className="flex flex-col items-center justify-center h-screen bg-blue-600 text-white">
-//       <div className="flex items-center justify-center mb-6">
-//         <img
-//           src="/path-to-logo.png"
-//           alt="SafeGuardHer"
-//           className="w-20 h-20"
-//         />
-//       </div>
-//       <h1 className="text-3xl font-bold mb-6">SafeGuardHer</h1>
-//       <div className="mb-6">
-//         <img
-//           src="/path-to-illustration.png"
-//           alt="Illustration"
-//           className="w-60 h-60"
-//         />
-//       </div>
-//       <button
-//         onClick={() => navigate("/loginPage")}
-//         className="bg-pink-500 px-8 py-3 rounded-full mb-4 text-white font-semibold shadow-md hover:bg-pink-600"
-//       >
-//         Login
-//       </button>
-//       <button
-//         onClick={signupWithGoogle}
-//         className="bg-blue-800 px-8 py-3 rounded-full text-white font-semibold shadow-md hover:bg-blue-700"
-//       >
-//         Continue using Google
-//       </button>
-//       <p className="mt-6">
-//         Don&apos;t have an account?{" "}
-//         <span
-//           onClick={() => navigate("/signUp")}
-//           className="text-pink-500 cursor-pointer underline"
-//         >
-//           Sign up here
-//         </span>
-//       </p>
-//     </div>
-//   );
-// }
-
-// export default AccountPage;
-
-// import React from "react";
-// import { useNavigate } from "react-router-dom";
-// import { getAuth, GoogleAuthProvider, getRedirectResult, signInWithRedirect } from "firebase/auth";
-// import { app } from "../firebase"; // Import the initialized Firebase app
-
-// const auth = getAuth(app); // Initialize auth with the Firebase app
-// const googleProvider = new GoogleAuthProvider();
-
-// function AccountPage() {
-//   const navigate = useNavigate();
-
-
-//   // Handle the redirect result
-//   React.useEffect(() => {
-//     getRedirectResult(auth)
-//       .then((result) => {
-//         if (result) {
-//           console.log("User signed in:", result.user);
-//         }
-//       })
-//       .catch((error) => {
-//         console.error("Error handling redirect result:", error);
-//       });
-//   }, []);
-
-//   return (
-//     <div className="flex flex-col items-center justify-center h-screen bg-blue-600 text-white">
-//       <div className="flex items-center justify-center mb-6">
-//         <img src="/path-to-logo.png" alt="SafeGuardHer" className="w-20 h-20" />
-//       </div>
-//       <h1 className="text-3xl font-bold mb-6">SafeGuardHer</h1>
-//       <div className="mb-6">
-//         <img src="/path-to-illustration.png" alt="Illustration" className="w-60 h-60" />
-//       </div>
-//       <button
-//         onClick={() => navigate("/loginPage")}
-//         className="bg-pink-500 px-8 py-3 rounded-full mb-4 text-white font-semibold shadow-md hover:bg-pink-600"
-//       >
-//         Login
-//       </button>
-//       <button
-//           onClick={() => navigate("/signUp")}
-//         className="bg-blue-800 px-8 py-3 rounded-full text-white font-semibold shadow-md hover:bg-blue-700"
-//       >
-//           Sign up 
-//       </button>
-      
-//     </div>
-//   );
-// }
-
-// export default AccountPage;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAuth, GoogleAuthProvider, getRedirectResult } from "firebase/auth";
-import { app } from "../firebase"; // Import the initialized Firebase app
+
+import logo from "../assets/logo.png";
+import Login from "../assets/Login.png";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
+} from "firebase/auth";
+import { app } from "../firebase"; // Import your Firebase app instance
 
 const auth = getAuth(app); // Initialize auth with the Firebase app
 const googleProvider = new GoogleAuthProvider();
@@ -356,52 +18,612 @@ const googleProvider = new GoogleAuthProvider();
 function AccountPage() {
   const navigate = useNavigate();
 
-  // Handle the redirect result
-  React.useEffect(() => {
-    getRedirectResult(auth)
-      .then((result) => {
+  const handleGoogleSignIn = async () => {
+    try {
+      // Use signInWithRedirect for better mobile compatibility
+      if (window.innerWidth < 768) {
+        await signInWithRedirect(auth, googleProvider);
+      } else {
+        const result = await signInWithPopup(auth, googleProvider);
+        console.log("User signed in:", result.user);
+        navigate("/homeMain");
+      }
+    } catch (error) {
+      console.error("Error during Google sign-in:", error.message);
+      alert("Sign-in failed. Please try again.");
+    }
+  };
+
+  useEffect(() => {
+    // Handle Google redirect results
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
         if (result) {
-          console.log("User signed in:", result.user);
+          console.log("User signed in via redirect:", result.user);
+          navigate("/homeMain");
         }
-      })
-      .catch((error) => {
-        console.error("Error handling redirect result:", error);
-      });
-  }, []);
+      } catch (error) {
+        console.error("Error handling redirect result:", error.message);
+      }
+    };
+
+    handleRedirectResult();
+  }, [navigate]);
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-white text-gray-800">
-      {/* Logo Section */}
-      <div className="flex items-center justify-center mb-6">
-        <img src="/path-to-logo.png" alt="SafeGuardHer" className="w-20 h-20" />
+    <div className="flex flex-col items-center justify-between min-h-screen bg-white p-6 text-gray-800">
+      {/* Header Section */}
+      <div className="w-full flex justify-between items-center py-4 border-b border-pink-200">
+        <img src={logo} alt="AngelWatch Logo" className="h-14" />
+        <h1 className="text-lg font-bold text-pink-600">Welcome</h1>
       </div>
-      
-      {/* App Title */}
-      <h1 className="text-3xl font-bold text-pink-600 mb-6">SafeGuardHer</h1>
-      
+
       {/* Illustration Section */}
-      <div className="mb-6">
-        <img src="/path-to-illustration.png" alt="Illustration" className="w-60 h-60" />
+      <div className="flex flex-col items-center space-y-4 mt-8">
+        <img src={Login} alt="Illustration" className="h-64 object-contain rounded-lg" />
+        <h2 className="text-2xl font-bold text-pink-600">AngelWatch</h2>
+        <p className="text-sm text-gray-500 text-center">
+          Your companion for safety and emergency assistance.
+        </p>
       </div>
-      
-      {/* Buttons */}
-      <div className="flex flex-col items-center space-y-4">
+
+      {/* Buttons Section */}
+      <div className="w-full max-w-sm mt-8 flex flex-col space-y-4">
         <button
           onClick={() => navigate("/loginPage")}
-          className="bg-pink-600 text-white px-10 py-3 rounded-full font-semibold shadow-md hover:bg-pink-700 transition-all"
+          className="w-full bg-pink-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-pink-700 transition duration-200"
         >
           Login
         </button>
-
         <button
           onClick={() => navigate("/signUp")}
-          className="bg-white text-pink-600 border-2 border-pink-600 px-9 py-3 rounded-full font-semibold shadow-md hover:bg-pink-600 hover:text-white transition-all"
+          className="w-full bg-pink-100 text-pink-600 py-3 rounded-lg font-medium shadow-md hover:bg-pink-200 transition duration-200"
         >
-          Sign up
+          Sign Up
         </button>
+
+        {/* Google Login Button */}
+        <button
+          onClick={handleGoogleSignIn}
+          className="w-full bg-pink-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-pink-700 transition duration-200"
+        >
+          Login with Google
+        </button>
+      </div>
+
+      {/* Footer Section */}
+      <div className="w-full py-4 border-t border-pink-200 text-center text-xs text-gray-500 mt-8">
+        © {new Date().getFullYear()} AngelWatch. All rights reserved.
       </div>
     </div>
   );
 }
 
 export default AccountPage;
+
+
+
+
+
+
+
+
+
+
+// import React, { useEffect } from "react";
+// import { useNavigate } from "react-router-dom";
+
+// import logo from "../assets/logo.png";
+// import Login from "../assets/Login.png";
+// import {
+//   getAuth,
+//   GoogleAuthProvider,
+//   signInWithPopup,
+//   signInWithRedirect,
+//   getRedirectResult,
+// } from "firebase/auth";
+// import { app } from "../firebase"; // Import your Firebase app instance
+
+// const auth = getAuth(app); // Initialize auth with the Firebase app
+// const googleProvider = new GoogleAuthProvider();
+
+// function AccountPage() {
+//   const navigate = useNavigate();
+
+//   const handleGoogleSignIn = async () => {
+//     try {
+//       // Use signInWithRedirect for better mobile compatibility
+//       if (window.innerWidth < 768) {
+//         await signInWithRedirect(auth, googleProvider);
+//       } else {
+//         const result = await signInWithPopup(auth, googleProvider);
+//         console.log("User signed in:", result.user);
+//         navigate("/homeMain");
+//       }
+//     } catch (error) {
+//       console.error("Error during Google sign-in:", error.message);
+//       alert("Sign-in failed. Please try again.");
+//     }
+//   };
+
+//   useEffect(() => {
+//     // Handle Google redirect results
+//     const handleRedirectResult = async () => {
+//       try {
+//         const result = await getRedirectResult(auth);
+//         if (result) {
+//           console.log("User signed in via redirect:", result.user);
+//           navigate("/homeMain");
+//         }
+//       } catch (error) {
+//         console.error("Error handling redirect result:", error.message);
+//       }
+//     };
+
+//     handleRedirectResult();
+//   }, [navigate]);
+
+//   return (
+//     <div className="flex flex-col items-center justify-between min-h-screen bg-white p-6 text-gray-800">
+//       {/* Header Section */}
+//       <div className="w-full flex justify-between items-center py-4 border-b border-gray-300">
+//         <img src={logo} alt="AngelWatch Logo" className="h-14" />
+//         <h1 className="text-lg font-bold text-gray-900">Welcome</h1>
+//       </div>
+
+//       {/* Illustration Section */}
+//       <div className="flex flex-col items-center space-y-4">
+//         <img src={Login} alt="Illustration" className="h-64 object-contain rounded-lg" />
+//         <h2 className="text-xl font-bold text-gray-900">AngelWatch</h2>
+//         <p className="text-sm text-gray-600 text-center">
+//           Your companion for safety and emergency assistance.
+//         </p>
+//       </div>
+
+//       {/* Buttons Section */}
+//       <div className="w-full flex flex-col space-y-4">
+//         <button
+//           onClick={() => navigate("/loginPage")}
+//           className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition duration-200"
+//         >
+//           Login
+//         </button>
+//         <button
+//           onClick={() => navigate("/signUp")}
+//           className="w-full bg-gray-100 text-blue-600 py-3 rounded-lg font-medium shadow-md hover:bg-gray-200 transition duration-200"
+//         >
+//           Sign Up
+//         </button>
+
+//         {/* Google Login Button */}
+//         <button
+//           onClick={handleGoogleSignIn}
+//           className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition duration-200"
+//         >
+//           Login with Google
+//         </button>
+//       </div>
+
+//       {/* Footer Section */}
+//       <div className="w-full py-4 border-t border-gray-300 text-center text-xs text-gray-500">
+//         Â© {new Date().getFullYear()} AngelWatch. All rights reserved.
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default AccountPage;
+
+
+
+
+
+
+
+
+
+
+// import React from "react";
+// import { useNavigate } from "react-router-dom";
+
+// import logo from "../assets/logo.png";
+// import Login from "../assets/Login.png";
+// import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+// import { app } from "../firebase"; // Import your Firebase app instance
+
+// const auth = getAuth(app); // Initialize auth with the Firebase app
+// const googleProvider = new GoogleAuthProvider();
+
+// function AccountPage() {
+//   const navigate = useNavigate();
+
+//   const handleGoogleSignIn = async () => {
+//     try {
+//       const result = await signInWithPopup(auth, googleProvider);
+//       console.log("User signed in:", result.user);
+//       // Navigate to the home page after successful login
+//       navigate("/homeMain");
+//     } catch (error) {
+//       console.error("Error during Google sign-in:", error.message);
+//       alert("Sign-in failed. Please try again.");
+//     }
+//   };
+
+//   return (
+//     <div className="flex flex-col items-center justify-between min-h-screen bg-white p-6 text-gray-800">
+//       {/* Header Section */}
+//       <div className="w-full flex justify-between items-center py-4 border-b border-gray-300">
+//         <img src={logo} alt="AngelWatch Logo" className="h-14" />
+//         <h1 className="text-lg font-bold text-gray-900">Welcome</h1>
+//       </div>
+
+//       {/* Illustration Section */}
+//       <div className="flex flex-col items-center space-y-4">
+//         <img src={Login} alt="Illustration" className="h-64 object-contain rounded-lg" />
+//         <h2 className="text-xl font-bold text-gray-900">AngelWatch</h2>
+//         <p className="text-sm text-gray-600 text-center">
+//           Your companion for safety and emergency assistance.
+//         </p>
+//       </div>
+
+//       {/* Buttons Section */}
+//       <div className="w-full flex flex-col space-y-4">
+//         <button
+//           onClick={() => navigate("/loginPage")}
+//           className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition duration-200"
+//         >
+//           Login
+//         </button>
+//         <button
+//           onClick={() => navigate("/signUp")}
+//           className="w-full bg-gray-100 text-blue-600 py-3 rounded-lg font-medium shadow-md hover:bg-gray-200 transition duration-200"
+//         >
+//           Sign Up
+//         </button>
+
+//         {/* Google Login Button */}
+//         <button
+//           onClick={handleGoogleSignIn}
+//           className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition duration-200"
+//         >
+//           Login with Google
+//         </button>
+//       </div>
+
+//       {/* Footer Section */}
+//       <div className="w-full py-4 border-t border-gray-300 text-center text-xs text-gray-500">
+//         Â© {new Date().getFullYear()} AngelWatch. All rights reserved.
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default AccountPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React from "react";
+// import { useNavigate } from "react-router-dom";
+
+// import logo from "../assets/logo.png";
+// import Login from "../assets/Login.png";
+// import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+// import { app } from "../firebase"; // Import your Firebase app instance
+
+// const auth = getAuth(app); // Initialize auth with the Firebase app
+// const googleProvider = new GoogleAuthProvider();
+
+// function AccountPage() {
+//   const navigate = useNavigate();
+
+//   const handleGoogleSignIn = async () => {
+//     try {
+//       const result = await signInWithPopup(auth, googleProvider);
+//       console.log("User signed in:", result.user);
+//       // Navigate to the home page after successful login
+//       navigate("/homeMain");
+//     } catch (error) {
+//       console.error("Error during Google sign-in:", error.message);
+//       alert("Sign-in failed. Please try again.");
+//     }
+//   };
+
+
+//   React.useEffect(() => {
+//     const timeoutId = setTimeout(() => {
+//       getRedirectResult(auth)
+//         .then((result) => {
+//           if (result) {
+//             console.log("User signed in:", result.user);
+//             navigate("/homeMain");
+//           } else {
+//             console.log("No result returned from getRedirectResult.");
+//           }
+//         })
+//         .catch((error) => {
+//           console.error("Error handling redirect result:", error);
+//         });
+//     }, 100); // Adjust the delay as needed
+  
+//     return () => clearTimeout(timeoutId);
+//   }, [navigate]);
+  
+
+
+//   return (
+//     <div className="flex flex-col items-center justify-between min-h-screen bg-white p-6 text-gray-800">
+//       {/* Header Section */}
+//       <div className="w-full flex justify-between items-center py-4 border-b border-gray-300">
+//         <img src={logo} alt="AngelWatch Logo" className="h-14" />
+//         <h1 className="text-lg font-bold text-gray-900">Welcome</h1>
+//       </div>
+
+//       {/* Illustration Section */}
+//       <div className="flex flex-col items-center space-y-4">
+//         <img src={Login} alt="Illustration" className="h-64 object-contain rounded-lg" />
+//         <h2 className="text-xl font-bold text-gray-900">AngelWatch</h2>
+//         <p className="text-sm text-gray-600 text-center">
+//           Your companion for safety and emergency assistance.
+//         </p>
+//       </div>
+
+//       {/* Buttons Section */}
+//       <div className="w-full flex flex-col space-y-4">
+//         <button onClick={() => navigate("/loginPage")} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition duration-200">
+//           Login
+//         </button>
+//         <button onClick={() => navigate("/signUp")} className="w-full bg-gray-100 text-blue-600 py-3 rounded-lg font-medium shadow-md hover:bg-gray-200 transition duration-200">
+//           Sign Up
+//         </button>
+
+//         {/* Google Login Button */}
+//         <button onClick={handleGoogleSignIn} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition duration-200">
+//           Login with Google
+//         </button>
+//       </div>
+
+//       {/* Footer Section */}
+//       <div className="w-full py-4 border-t border-gray-300 text-center text-xs text-gray-500">
+//         Â© {new Date().getFullYear()} AngelWatch. All rights reserved.
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default AccountPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import React from "react";
+// import { useNavigate } from "react-router-dom";
+// import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "firebase/auth";
+// import { app } from "../firebase"; // Import the initialized Firebase app
+// import logo from "../assets/logo.png";
+// import Login from "../assets/Login.png";
+
+// const auth = getAuth(app); // Initialize auth with the Firebase app
+// const googleProvider = new GoogleAuthProvider();
+
+// function AccountPage() {
+//   const navigate = useNavigate();
+
+//   // Handle the redirect result for Google login
+//   React.useEffect(() => {
+//     getRedirectResult(auth)
+//       .then((result) => {
+//         if (result && result.user) {
+//           console.log("User signed in:", result.user);
+//           // Navigate to the homeMain page or dashboard upon successful login
+//           navigate("/homeMain");
+//         }
+//       })
+//       .catch((error) => {
+//         console.error("Error handling redirect result:", error);
+//       });
+//   }, [navigate]);
+
+//   // Handle Google login via redirect
+//   const handleGoogleLogin = () => {
+//     signInWithRedirect(auth, googleProvider);
+//   };
+
+//   return (
+//     <div className="flex flex-col items-center justify-between min-h-screen bg-white p-6 text-gray-800">
+//       {/* Header Section */}
+//       <div className="w-full flex justify-between items-center py-4 border-b border-gray-300">
+//         <img src={logo} alt="AngelWatch Logo" className="h-14" />
+//         <h1 className="text-lg font-bold text-gray-900">Welcome</h1>
+//       </div>
+
+//       {/* Illustration Section */}
+//       <div className="flex flex-col items-center space-y-4">
+//         <img
+//           src={Login}
+//           alt="Illustration"
+//           className="h-64 object-contain rounded-lg"
+//         />
+//         <h2 className="text-xl font-bold text-gray-900">AngelWatch</h2>
+//         <p className="text-sm text-gray-600 text-center">
+//           Your companion for safety and emergency assistance.
+//         </p>
+//       </div>
+
+//       {/* Buttons Section */}
+//       <div className="w-full flex flex-col space-y-4">
+//         <button
+//           onClick={() => navigate("/loginPage")}
+//           className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition duration-200"
+//         >
+//           Login
+//         </button>
+//         <button
+//           onClick={() => navigate("/signUp")}
+//           className="w-full bg-gray-100 text-blue-600 py-3 rounded-lg font-medium shadow-md hover:bg-gray-200 transition duration-200"
+//         >
+//           Sign Up
+//         </button>
+
+//         {/* Google Login Button */}
+//         <button
+//           onClick={handleGoogleLogin}
+//           className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition duration-200"
+//         >
+//           Login with Google
+//         </button>
+//       </div>
+
+//       {/* Footer Section */}
+//       <div className="w-full py-4 border-t border-gray-300 text-center text-xs text-gray-500">
+//         Â© {new Date().getFullYear()} AngelWatch. All rights reserved.
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default AccountPage;
+
+
+
+
+// import React from "react";
+// import { useNavigate } from "react-router-dom";
+// import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "firebase/auth";
+// import { app } from "../firebase"; // Import the initialized Firebase app
+// import logo from "../assets/logo.png";
+// import Login from "../assets/Login.png";
+
+// const auth = getAuth(app); // Initialize auth with the Firebase app
+// const googleProvider = new GoogleAuthProvider();
+
+// function AccountPage() {
+//   const navigate = useNavigate();
+
+//   // Handle the redirect result for Google login
+//   React.useEffect(() => {
+//     getRedirectResult(auth)
+//       .then((result) => {
+//         if (result) {
+//           console.log("User signed in:", result.user);
+//           // Navigate to the homeMain page after successful login
+//           navigate("/homeMain"); // Updated to navigate to homeMain
+//         }
+//       })
+//       .catch((error) => {
+//         console.error("Error handling redirect result:", error);
+//       });
+//   }, [navigate]);
+
+//   // Handle Google login via redirect
+//   const handleGoogleLogin = () => {
+//     signInWithRedirect(auth, googleProvider);
+//   };
+
+//   return (
+//     <div className="flex flex-col items-center justify-between min-h-screen bg-white p-6 text-gray-800">
+//       {/* Header Section */}
+//       <div className="w-full flex justify-between items-center py-4 border-b border-gray-300">
+//         <img src={logo} alt="AngelWatch Logo" className="h-14" />
+//         <h1 className="text-lg font-bold text-gray-900">Welcome</h1>
+//       </div>
+
+//       {/* Illustration Section */}
+//       <div className="flex flex-col items-center space-y-4">
+//         <img
+//           src={Login}
+//           alt="Illustration"
+//           className="h-64 object-contain rounded-lg"
+//         />
+//         <h2 className="text-xl font-bold text-gray-900">AngelWatch</h2>
+//         <p className="text-sm text-gray-600 text-center">
+//           Your companion for safety and emergency assistance.
+//         </p>
+//       </div>
+
+//       {/* Buttons Section */}
+//       <div className="w-full flex flex-col space-y-4">
+//         <button
+//           onClick={() => navigate("/loginPage")}
+//           className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition duration-200"
+//         >
+//           Login
+//         </button>
+//         <button
+//           onClick={() => navigate("/signUp")}
+//           className="w-full bg-gray-100 text-blue-600 py-3 rounded-lg font-medium shadow-md hover:bg-gray-200 transition duration-200"
+//         >
+//           Sign Up
+//         </button>
+
+//         {/* Google Login Button */}
+//         <button
+//           onClick={handleGoogleLogin}
+//           className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium shadow-md hover:bg-blue-700 transition duration-200"
+//         >
+//           Login with Google
+//         </button>
+//       </div>
+
+//       {/* Footer Section */}
+//       <div className="w-full py-4 border-t border-gray-300 text-center text-xs text-gray-500">
+//         Â© {new Date().getFullYear()} AngelWatch. All rights reserved.
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default AccountPage;

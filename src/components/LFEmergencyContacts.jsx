@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import EmergencyHelpline from "../assets/EmergencyHelpline.png";
 
 function EmergencyContacts() {
   const navigate = useNavigate();
@@ -15,18 +16,18 @@ function EmergencyContacts() {
     <div className="min-h-screen bg-gradient-to-b from-rose-400 via-pink-300 to-blue-200 text-rose-900 flex flex-col items-center justify-center text-center p-6 relative">
       {/* Emergency contacts image */}
       <img
-        src="https://source.unsplash.com/400x400/?emergency,contacts"
+        src={EmergencyHelpline}
         alt="Emergency Contacts"
-        className="w-60 h-60 mb-4 rounded-lg shadow-lg transform transition-transform duration-700 hover:scale-110"
+        className="h-64 mb-4 rounded-lg transform transition-transform duration-700 hover:scale-110 animate__animated animate__zoomIn"
       />
 
       {/* Heading */}
-      <h2 className="text-3xl font-extrabold mb-3">
+      <h2 className="text-3xl font-extrabold mb-3 animate__animated animate__fadeInDown">
         Emergency Contacts
       </h2>
 
       {/* Description */}
-      <p className="text-lg mb-6 opacity-80">
+      <p className="text-lg mb-6 opacity-80 animate__animated animate__fadeInUp">
         Access important emergency contacts and helpline numbers at your fingertips.
       </p>
 

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import HiddenCameraImage from "../assets/HiddenCamera.png";
 
 function HiddenCamera() {
   const navigate = useNavigate();
@@ -15,9 +16,9 @@ function HiddenCamera() {
     <div className="min-h-screen bg-gradient-to-b from-rose-400 via-pink-300 to-blue-200 text-rose-900 flex flex-col items-center justify-center text-center p-6 relative">
       {/* Animated Hidden Camera Image */}
       <img
-        src="https://source.unsplash.com/400x400/?camera,hidden"
+        src={HiddenCameraImage}
         alt="Hidden Camera"
-        className="w-60 h-60 mb-4 rounded-lg shadow-lg animate__animated animate__zoomIn"
+        className="h-64 mb-4 rounded-lg animate__animated animate__zoomIn"
       />
 
       {/* Animated Title */}

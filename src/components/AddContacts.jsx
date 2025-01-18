@@ -114,6 +114,7 @@
 
 import React, { useState, useEffect } from "react";
 import { UserPlus, Trash, Phone, ArrowRight } from "lucide-react";
+import NavBar from "./Navbar";
 
 export default function AddContacts() {
   const [contacts, setContacts] = useState(() => {
@@ -148,6 +149,10 @@ export default function AddContacts() {
   };
 
   return (
+    <div>
+    <div>
+        <NavBar />
+    </div>
     <div className="min-h-screen bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-xl shadow-lg overflow-hidden">
         <div className="p-6 sm:p-8">
@@ -218,6 +223,7 @@ export default function AddContacts() {
           </p>
         </div>
       </div>
+    </div>
     </div>
   );
 }
