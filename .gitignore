@@ -32,3 +32,4 @@ build
 
 firebase.js
 functions/index.js
+.vite
