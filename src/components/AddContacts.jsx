@@ -123,7 +123,7 @@ export default function AddContacts() {
   });
   const maxContacts = 5;
 
-  const handleAddContact = () => {
+  const handleAddContact = () => {   
     if (contacts.length < maxContacts) {
       setContacts([...contacts, ""]);
     }
