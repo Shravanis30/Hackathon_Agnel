@@ -11,7 +11,7 @@ import {
   getRedirectResult,
 } from "firebase/auth";
 import { app } from "../firebase"; // Import your Firebase app instance
-
+    
 const auth = getAuth(app); // Initialize auth with the Firebase app
 const googleProvider = new GoogleAuthProvider();
 
