@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "postinstall": "rm -rf node_modules/.vite && vite"
+    "postinstall": "rm -rf node_modules/.vite"
   },
   "dependencies": {
     "@capacitor/android": "^6.2.0",
